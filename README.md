@@ -1,97 +1,138 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# FaceAISDK React Native Demo
 
-# Getting Started
+FaceAISDK 人脸识别、活体检测 React Native 演示项目，支持 iOS 和 Android 双端。所有功能无需后台API服务可完全离线运行。
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+## 功能列表
 
-## Step 1: Start Metro
+| 功能 | iOS | Android |
+|------|-----|---------|
+| SDK相机录入人脸信息 | ✅ | ✅ |
+| 1:1人脸识别+活体检测 | ✅ | ✅ |
+| 活体检测（动作/炫彩/静默） | ✅ | ✅ |
+| 查询人脸特征信息 | ✅ | ✅ |
+| 同步人脸特征信息 | ✅ | ✅ |
+| 图片录入人脸信息 | ✅ | ✅ |
+| 删除人脸特征信息 | ✅ | ✅ |
+| 切换摄像头 | - | ✅ |
+| 跳转原生FaceAI导航页面 | ✅ | ✅ |
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+## 人脸识别/活体检测状态码
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+| Code | 含义 |
+|------|------|
+| 0 | 初始化状态，流程没有开始 |
+| 1 | 人脸识别对比成功（大于设置的threshold） |
+| 2 | 人脸识别对比失败（小于设置的threshold） |
+| 3 | 动作活体检测成功 |
+| 4 | 动作活体超时 |
+| 5 | 多次没有检测到人脸 |
+| 6 | 没有对应的人脸特征值 |
+| 7 | 炫彩活体成功 |
+| 8 | 炫彩活体失败 |
+| 9 | 炫彩活体失败（光线亮度过高） |
+| 10 | 所有活体检测完成 |
+| 11 | 静默活体检测失败 |
+| 12 | 没有录入人脸信息 |
+| 13 | 多人脸出现在镜头 |
+
+## 项目结构
+
+```
+├── App.tsx                      # RN 主页面（区分平台展示）
+├── android/
+│   └── app/src/main/java/com/facern/
+│       ├── MainActivity.kt       # Android 主 Activity
+│       ├── MainApplication.kt    # 注册 FaceRNPackage
+│       ├── FaceRNModule.kt       # FaceAISDK 原生桥接模块
+│       └── FaceRNPackage.kt      # React Native Package 注册
+├── ios/
+│   ├── FaceRNModule.m            # iOS 原生桥接模块
+│   ├── FaceImportController.swift
+│   ├── MyViewController.m        # iOS 演示页面
+│   └── ...
+```
+
+## 环境要求
+
+- React Native 0.79+
+- iOS 13.0+
+- Android minSdkVersion 24
+
+## Getting Started
+
+> **Note**: 请确保已完成 [React Native 环境配置](https://reactnative.dev/docs/set-up-your-environment)。
+
+### Step 1: 启动 Metro
 
 ```sh
-# Using npm
 npm start
-
-# OR using Yarn
-yarn start
 ```
 
-## Step 2: Build and run your app
+### Step 2: 运行应用
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
+#### Android
 
 ```sh
-# Using npm
 npm run android
-
-# OR using Yarn
-yarn android
 ```
 
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+#### iOS
 
 ```sh
 bundle install
-```
-
-Then, and every time you update your native dependencies, run:
-
-```sh
 bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
 npm run ios
-
-# OR using Yarn
-yarn ios
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+## Android 集成说明
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+Android 端通过 React Native Native Module 桥接调用 FaceAISDK，主要依赖：
 
-## Step 3: Modify your app
+```groovy
+implementation("io.github.faceaisdk:Android:2026.05.27.search")
+implementation("com.tencent:mmkv:1.3.14")
+```
 
-Now that you have successfully run the app, let's make changes!
+### 桥接模块方法
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+`FaceRNModule` 对外暴露以下方法供 JS 层调用：
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+| 方法 | 说明 |
+|------|------|
+| `addFaceBySDKCamera(faceID, mode, showConfirm, callback)` | SDK相机录入人脸 |
+| `faceVerify(faceID, threshold, livenessType, motionTypes, timeout, steps, allowMulti, callback)` | 1:1人脸识别+活体检测 |
+| `livenessVerify(livenessType, motionTypes, timeout, steps, allowMulti, callback)` | 活体检测 |
+| `getFaceFeature(faceID, callback)` | 查询本地人脸特征 |
+| `insertFaceFeature(faceID, faceFeature, callback)` | 同步人脸特征 |
+| `addFaceBySDKImage(faceID, base64Image, callback)` | 图片录入人脸 |
+| `deleteFaceFeature(faceID, callback)` | 删除人脸特征 |
+| `switchCamera(cameraID)` | 切换摄像头(0前置/1后置) |
+| `openFaceAIActivity()` | 跳转原生FaceAI导航页 |
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+### 回调结果 (ResultJSON)
 
-## Congratulations! :tada:
+```json
+{
+  "code": 1,
+  "msg": "操作成功",
+  "faceID": "yourFaceID",
+  "similarity": 0.92,
+  "liveness": 0.99,
+  "faceFeature": "1024 length string",
+  "faceBase64": "base64 encoded face image"
+}
+```
 
-You've successfully run and modified your React Native App. :partying_face:
+## iOS 集成说明
 
-### Now what?
+iOS 端通过 `FaceRNModule` (Objective-C) 桥接调用 FaceAISDK_Core (Swift)。使用 CocoaPods 管理依赖。
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+## 参考
 
-# Troubleshooting
+- [FaceAISDK Android](https://github.com/FaceAISDK/FaceAISDK_Android)
+- [FaceAISDK iOS](https://github.com/FaceAISDK/FaceAISDK_iOS)
+- [FaceAISDK UniApp UTS 插件](https://github.com/FaceAISDK/FaceAISDK_uniapp_UTS)
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+## License
 
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+Powered by FaceAISDK Copyright©2026
