@@ -46,7 +46,7 @@ class FaceRNModule(reactContext: ReactApplicationContext) :
      * 检查并请求相机权限
      */
     private fun checkCameraPermission(action: () -> Unit) {
-        val activity = currentActivity ?: return
+        val activity = reactApplicationContext.currentActivity ?: return
         if (ContextCompat.checkSelfPermission(activity, Manifest.permission.CAMERA)
             == PackageManager.PERMISSION_GRANTED
         ) {
@@ -60,7 +60,7 @@ class FaceRNModule(reactContext: ReactApplicationContext) :
                 object : PermissionListener {
                     override fun onRequestPermissionsResult(
                         requestCode: Int,
-                        permissions: Array<out String>,
+                        permissions: Array<String>,
                         grantResults: IntArray
                     ): Boolean {
                         if (requestCode == PERMISSION_REQUEST_CODE) {
@@ -94,7 +94,7 @@ class FaceRNModule(reactContext: ReactApplicationContext) :
         needShowConfirmDialog: Boolean,
         callback: Callback
     ) {
-        val activity = currentActivity ?: return
+        val activity = reactApplicationContext.currentActivity ?: return
         mCallback = callback
         mCurrentFaceID = faceID
 
@@ -127,7 +127,7 @@ class FaceRNModule(reactContext: ReactApplicationContext) :
         allowMultiFaces: Boolean,
         callback: Callback
     ) {
-        val activity = currentActivity ?: return
+        val activity = reactApplicationContext.currentActivity ?: return
         mCallback = callback
         mCurrentFaceID = faceID
 
@@ -161,7 +161,7 @@ class FaceRNModule(reactContext: ReactApplicationContext) :
         allowMultiFaces: Boolean,
         callback: Callback
     ) {
-        val activity = currentActivity ?: return
+        val activity = reactApplicationContext.currentActivity ?: return
         mCallback = callback
         mCurrentFaceID = ""
 
@@ -195,20 +195,21 @@ class FaceRNModule(reactContext: ReactApplicationContext) :
         if (faceFeature.isNullOrEmpty()) {
             result.putInt("code", 0)
             result.putString("msg", "Face Feature not exist")
-            result.putString("faceID", faceID)
             result.putString("faceFeature", "")
         } else if (faceFeature.length != 1024) {
             result.putInt("code", 0)
             result.putString("msg", "Face Feature length should be 1024")
-            result.putString("faceID", faceID)
             result.putString("faceFeature", "")
         } else {
             result.putInt("code", 1)
             result.putString("msg", "Face Feature exist")
-            result.putString("faceID", faceID)
             result.putString("faceFeature", faceFeature)
         }
 
+        result.putString("faceID", faceID)
+        result.putDouble("similarity", 0.0)
+        result.putDouble("liveness", 0.0)
+        result.putString("faceBase64", "")
         callback.invoke(result)
     }
 
@@ -235,6 +236,10 @@ class FaceRNModule(reactContext: ReactApplicationContext) :
         }
 
         result.putString("faceID", faceID)
+        result.putDouble("similarity", 0.0)
+        result.putDouble("liveness", 0.0)
+        result.putString("faceFeature", "")
+        result.putString("faceBase64", "")
         callback.invoke(result)
     }
 
@@ -243,7 +248,7 @@ class FaceRNModule(reactContext: ReactApplicationContext) :
      */
     @ReactMethod
     fun addFaceBySDKImage(faceID: String, base64FaceImage: String, callback: Callback) {
-        val activity = currentActivity ?: return
+        val activity = reactApplicationContext.currentActivity ?: return
         FaceSDKConfig.init(activity)
 
         Image2FaceFeature.getInstance(activity)
@@ -253,7 +258,10 @@ class FaceRNModule(reactContext: ReactApplicationContext) :
                     result.putInt("code", 0)
                     result.putString("msg", msg)
                     result.putString("faceID", faceID)
+                    result.putDouble("similarity", 0.0)
+                    result.putDouble("liveness", 0.0)
                     result.putString("faceFeature", "")
+                    result.putString("faceBase64", "")
                     callback.invoke(result)
                 }
 
@@ -266,7 +274,10 @@ class FaceRNModule(reactContext: ReactApplicationContext) :
                     result.putInt("code", 1)
                     result.putString("msg", "getFaceFeature Success")
                     result.putString("faceID", faceID)
+                    result.putDouble("similarity", 0.0)
+                    result.putDouble("liveness", 0.0)
                     result.putString("faceFeature", faceFeature)
+                    result.putString("faceBase64", "")
                     callback.invoke(result)
                 }
             })
@@ -288,33 +299,15 @@ class FaceRNModule(reactContext: ReactApplicationContext) :
         result.putInt("code", 1)
         result.putString("msg", "Delete Success")
         result.putString("faceID", faceID)
+        result.putDouble("similarity", 0.0)
+        result.putDouble("liveness", 0.0)
+        result.putString("faceFeature", "")
+        result.putString("faceBase64", "")
         callback.invoke(result)
     }
 
-    /**
-     * 8. 切换摄像头 (仅Android)
-     */
-    @ReactMethod
-    fun switchCamera(cameraID: Int) {
-        val context = reactApplicationContext.applicationContext
-        FaceSDKConfig.init(context)
-        FaceSDKConfig.setCameraID(context, cameraID)
-    }
-
-    /**
-     * 9. 跳转到原生FaceAI导航页面
-     */
-    @ReactMethod
-    fun openFaceAIActivity() {
-        val activity = currentActivity ?: return
-        FaceSDKConfig.init(activity)
-        val intent = Intent()
-        intent.setClassName(activity, "com.faceAI.demo.FaceAINaviActivity")
-        activity.startActivity(intent)
-    }
-
     override fun onActivityResult(
-        activity: Activity?,
+        activity: Activity,
         requestCode: Int,
         resultCode: Int,
         data: Intent?
@@ -384,5 +377,5 @@ class FaceRNModule(reactContext: ReactApplicationContext) :
         mCurrentFaceID = ""
     }
 
-    override fun onNewIntent(intent: Intent?) {}
+    override fun onNewIntent(intent: Intent) {}
 }

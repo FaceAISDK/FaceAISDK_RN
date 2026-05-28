@@ -24,31 +24,51 @@ target 'FaceRN' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
 
-
   post_install do |installer|
-      react_native_post_install(
-        installer,
-        config[:reactNativePath],
-        :mac_catalyst_enabled => false,
-        # :ccache_enabled => true
-      )
-      
-      # 1. 优化全局项目配置
-      installer.pods_project.build_configurations.each do |config|
-        config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"  ## 兼容模拟器
-        config.build_settings["CLANG_ENABLE_MODULES"] = "YES"
-      end
-      
-      # 2. 遍历所有 target 并修复 RCTSwiftUI 错误 (修复语法错误的关键)
-      installer.pods_project.targets.each do |target|
-        if target.name == 'RCTSwiftUI'
-          target.build_configurations.each do |config|
-            # 强制允许 Swift 模块共享其头文件映射，解决 no such module 'React'
-            config.build_settings['DEFINES_MODULE'] = 'YES'
-          end
+    react_native_post_install(
+      installer,
+      config[:reactNativePath],
+      :mac_catalyst_enabled => false,
+      # :ccache_enabled => true
+    )
+    installer.pods_project.build_configurations.each do |config|
+      config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
+      config.build_settings["CLANG_ENABLE_MODULES"] = "YES"
+    end
+
+    # FaceAISDK_Core requires TensorFlowLiteSwift to have module interface (swiftinterface)
+    installer.pods_project.targets.each do |target|
+      if target.name == 'TensorFlowLiteSwift'
+        target.build_configurations.each do |bc|
+          bc.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
+          existing = bc.build_settings['OTHER_SWIFT_FLAGS'] || '$(inherited)'
+          bc.build_settings['OTHER_SWIFT_FLAGS'] = existing + ' -no-verify-emitted-module-interface'
         end
       end
-    
+    end
+
+    # Create module.modulemap for TensorFlowLite so it can be discovered during
+    # FaceAISDK_Core swiftinterface processing (Xcc flags are not propagated, but
+    # Swift -I paths are used for Clang module discovery in that context)
+    tfl_dir = "#{installer.sandbox.root}/Headers/Public/TensorFlowLite"
+    modulemap_link = File.join(tfl_dir, "module.modulemap")
+    unless File.exist?(modulemap_link)
+      File.symlink("TensorFlowLiteSwift.modulemap", modulemap_link)
+    end
+
+    # Add Pods/Headers/Public to SWIFT_INCLUDE_PATHS so TensorFlowLite/module.modulemap
+    # is discoverable during swiftinterface processing
+    pods_headers_public = "#{installer.sandbox.root}/Headers/Public"
+    installer.aggregate_targets.each do |aggregate_target|
+      aggregate_target.xcconfigs.each do |config_name, xcconfig|
+        existing = xcconfig.attributes['SWIFT_INCLUDE_PATHS'] || '$(inherited)'
+        unless existing.include?(pods_headers_public)
+          xcconfig.attributes['SWIFT_INCLUDE_PATHS'] = "#{existing} \"#{pods_headers_public}\""
+          xcconfig_path = aggregate_target.xcconfig_path(config_name)
+          xcconfig.save_as(xcconfig_path)
+        end
+      end
+    end
   end
 end
 

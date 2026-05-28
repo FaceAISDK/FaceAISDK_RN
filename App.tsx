@@ -12,33 +12,35 @@ import {
 
 const {FaceRNModule} = NativeModules;
 
-function App() {
-  // iOS: 跳转到原生 MYViewController
-  const handleiOSPress = () => {
-    try {
-      if (FaceRNModule?.openMYViewController) {
-        FaceRNModule.openMYViewController();
-      } else {
-        Alert.alert('提示', 'Native Module 尚未创建');
-      }
-    } catch (_e) {
-      Alert.alert('提示', 'Native Module 尚未创建');
-    }
-  };
+/**
+ * 统一回调结果类型
+ * iOS/Android 均返回相同结构:
+ * { code, msg, faceID, similarity, liveness, faceFeature, faceBase64 }
+ */
+type FaceResult = {
+  code: number;
+  msg: string;
+  faceID: string;
+  similarity: number;
+  liveness: number;
+  faceFeature: string;
+  faceBase64: string;
+};
 
-  // Android: SDK相机录入人脸信息
+function App() {
+  // 1. SDK相机录入人脸信息
   const addFaceBySDKCamera = () => {
     FaceRNModule.addFaceBySDKCamera(
       'yourFaceID',
       1, // 1.快速模式 2.精确模式
       true, // 是否显示确认框
-      (result: any) => {
-        Alert.alert('录入人脸结果', JSON.stringify(result));
+      (result: FaceResult) => {
+        Alert.alert('录入人脸结果', `code: ${result.code}\nmsg: ${result.msg}`);
       },
     );
   };
 
-  // Android: 人脸识别+活体检测
+  // 2. 人脸识别+活体检测
   const faceVerify = () => {
     FaceRNModule.faceVerify(
       'yourFaceID',
@@ -48,7 +50,7 @@ function App() {
       7, // 超时时间(秒)
       2, // 动作步骤数
       true, // 是否允许多人脸
-      (result: any) => {
+      (result: FaceResult) => {
         Alert.alert(
           '人脸识别结果',
           `code: ${result.code}\nmsg: ${result.msg}\nsimilarity: ${result.similarity}\nliveness: ${result.liveness}`,
@@ -57,7 +59,7 @@ function App() {
     );
   };
 
-  // Android: 活体检测
+  // 3. 活体检测
   const livenessVerify = () => {
     FaceRNModule.livenessVerify(
       2, // 1.动作活体 2.动作+炫彩 3.炫彩 4.静默
@@ -65,7 +67,7 @@ function App() {
       7, // 超时时间
       2, // 动作步骤数
       true, // 是否允许多人脸
-      (result: any) => {
+      (result: FaceResult) => {
         Alert.alert(
           '活体检测结果',
           `code: ${result.code}\nmsg: ${result.msg}\nliveness: ${result.liveness}`,
@@ -74,58 +76,57 @@ function App() {
     );
   };
 
-  // Android: 查询人脸特征
+  // 4. 查询人脸特征
   const getFaceFeature = () => {
-    FaceRNModule.getFaceFeature('yourFaceID', (result: any) => {
-      Alert.alert('查询人脸特征', JSON.stringify(result));
+    FaceRNModule.getFaceFeature('yourFaceID', (result: FaceResult) => {
+      Alert.alert(
+        '查询人脸特征',
+        `code: ${result.code}\nmsg: ${result.msg}\nfaceFeature长度: ${result.faceFeature?.length || 0}`,
+      );
     });
   };
 
-  // Android: 同步人脸特征
+  // 5. 同步人脸特征
   const insertFaceFeature = () => {
     FaceRNModule.insertFaceFeature(
       'yourFaceID',
       'faceFeature_1024_length_string',
-      (result: any) => {
-        Alert.alert('同步人脸特征', JSON.stringify(result));
+      (result: FaceResult) => {
+        Alert.alert('同步人脸特征', `code: ${result.code}\nmsg: ${result.msg}`);
       },
     );
   };
 
-  // Android: 删除人脸特征
+  // 6. 图片录入人脸信息
+  const addFaceByImage = () => {
+    // 实际使用时传入真实的base64图片
+    const demoBase64 = 'demo_base64_image_string';
+    FaceRNModule.addFaceBySDKImage(
+      'yourFaceID',
+      demoBase64,
+      (result: FaceResult) => {
+        Alert.alert(
+          '图片录入结果',
+          `code: ${result.code}\nmsg: ${result.msg}\nfaceFeature长度: ${result.faceFeature?.length || 0}`,
+        );
+      },
+    );
+  };
+
+  // 7. 删除人脸特征
   const deleteFaceFeature = () => {
-    FaceRNModule.deleteFaceFeature('yourFaceID', (result: any) => {
-      Alert.alert('删除人脸特征', JSON.stringify(result));
+    FaceRNModule.deleteFaceFeature('yourFaceID', (result: FaceResult) => {
+      Alert.alert('删除人脸特征', `code: ${result.code}\nmsg: ${result.msg}`);
     });
   };
 
-  // Android: 切换摄像头
-  const switchCamera = () => {
-    FaceRNModule.switchCamera(1); // 0前置 1后置
-    Alert.alert('提示', '已切换摄像头');
-  };
-
-  // Android: 跳转到原生FaceAI导航页面
-  const openFaceAIActivity = () => {
-    FaceRNModule.openFaceAIActivity();
-  };
-
-  if (Platform.OS === 'ios') {
-    return (
-      <View style={styles.container}>
-        <StatusBar barStyle="dark-content" />
-        <TouchableOpacity style={styles.button} onPress={handleiOSPress}>
-          <Text style={styles.buttonText}>跳转到 MYViewController</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
-  // Android UI
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
-      <Text style={styles.title}>FaceAISDK Android Demo</Text>
+      <Text style={styles.title}>FaceAISDK Demo</Text>
+      <Text style={styles.subtitle}>
+        {Platform.OS === 'ios' ? 'iOS' : 'Android'}
+      </Text>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}>
@@ -149,21 +150,14 @@ function App() {
           <Text style={styles.buttonText}>同步人脸特征信息</Text>
         </TouchableOpacity>
 
+        <TouchableOpacity style={styles.button} onPress={addFaceByImage}>
+          <Text style={styles.buttonText}>图片录入人脸信息</Text>
+        </TouchableOpacity>
+
         <TouchableOpacity style={styles.button} onPress={deleteFaceFeature}>
           <Text style={styles.buttonText}>删除人脸特征信息</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.buttonSecondary} onPress={switchCamera}>
-          <Text style={styles.buttonTextSecondary}>切换摄像头(仅Android)</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.buttonSecondary}
-          onPress={openFaceAIActivity}>
-          <Text style={styles.buttonTextSecondary}>
-            跳转原生FaceAI导航页面
-          </Text>
-        </TouchableOpacity>
       </ScrollView>
       <Text style={styles.footer}>Powered by FaceAISDK</Text>
     </View>
@@ -183,6 +177,11 @@ const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: '700',
     color: '#333333',
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#999999',
     marginBottom: 20,
   },
   scrollView: {
@@ -202,11 +201,6 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
   },
-  buttonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
   buttonSecondary: {
     backgroundColor: '#007AFF',
     paddingHorizontal: 24,
@@ -216,7 +210,7 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
   },
-  buttonTextSecondary: {
+  buttonText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',

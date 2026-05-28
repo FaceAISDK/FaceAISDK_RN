@@ -34,7 +34,9 @@
 		<true/>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>用于定位服务</string>
+	<key>NSCameraUsageDescription</key>
+	<string>需要使用相机进行人脸识别和活体检测</string>
 	<key>RCTNewArchEnabled</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

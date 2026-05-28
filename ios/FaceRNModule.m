@@ -2,39 +2,194 @@
 //  FaceRNModule.m
 //  FaceRN
 //
+//  This file is a duplicate. See FaceRN/FaceRNModule.m for the actual implementation.
+//  统一 iOS/Android 桥接 API，参考 FaceAISDK_uniapp_UTS
 
 #import "FaceRNModule.h"
-#import "MyViewController.h"
 #import <UIKit/UIKit.h>
+
+#import "FaceRN-Swift.h"
 
 @implementation FaceRNModule
 
 RCT_EXPORT_MODULE();
 
-RCT_EXPORT_METHOD(openMYViewController) {
++ (BOOL)requiresMainQueueSetup {
+    return YES;
+}
+
+- (dispatch_queue_t)methodQueue {
+    return dispatch_get_main_queue();
+}
+
+- (NSString *)getMsgByCode:(NSInteger)code {
+    switch (code) {
+        case 0: return [FaceSDKLocalizer text:@"User canceled/interrupted" defaultValue:@"User canceled/interrupted"];
+        case 1: return [FaceSDKLocalizer text:@"Operation succeeded" defaultValue:@"Operation succeeded"];
+        case 2: return [FaceSDKLocalizer text:@"Low face similarity (verification failed)" defaultValue:@"Low face similarity (verification failed)"];
+        case 3: return [FaceSDKLocalizer text:@"Motion liveness passed" defaultValue:@"Motion liveness passed"];
+        case 4: return [FaceSDKLocalizer text:@"Motion liveness timeout" defaultValue:@"Motion liveness timeout"];
+        case 5: return [FaceSDKLocalizer text:@"No face detected repeatedly" defaultValue:@"No face detected repeatedly"];
+        case 6: return [FaceSDKLocalizer text:@"No local face feature found" defaultValue:@"No local face feature found"];
+        case 7: return [FaceSDKLocalizer text:@"Color liveness passed" defaultValue:@"Color liveness passed"];
+        case 8: return [FaceSDKLocalizer text:@"Color liveness failed" defaultValue:@"Color liveness failed"];
+        case 9: return [FaceSDKLocalizer text:@"Ambient light too strong (color failed)" defaultValue:@"Ambient light too strong (color failed)"];
+        case 10: return [FaceSDKLocalizer text:@"All liveness checks passed" defaultValue:@"All liveness checks passed"];
+        case 11: return [FaceSDKLocalizer text:@"Silent liveness failed" defaultValue:@"Silent liveness failed"];
+        case 12: return [FaceSDKLocalizer text:@"No enrolled face information" defaultValue:@"No enrolled face information"];
+        case 13: return [FaceSDKLocalizer text:@"Multiple faces detected" defaultValue:@"Multiple faces detected"];
+        default: return [FaceSDKLocalizer text:@"Unknown status code" defaultValue:@"Unknown status code"];
+    }
+}
+
+RCT_EXPORT_METHOD(addFaceBySDKCamera:(NSString *)faceID
+                  addFacePerformanceMode:(nonnull NSNumber *)performanceMode
+                  needShowConfirmDialog:(BOOL)needConfirm
+                  callback:(RCTResponseSenderBlock)callback) {
     dispatch_async(dispatch_get_main_queue(), ^{
-        MyViewController *vc = [[MyViewController alloc] init];
-        vc.modalPresentationStyle = UIModalPresentationFullScreen;
-
-        UIWindow *keyWindow = nil;
-        for (UIWindowScene *windowScene in [UIApplication sharedApplication].connectedScenes) {
-            if ([windowScene isKindOfClass:[UIWindowScene class]] && windowScene.activationState == UISceneActivationStateForegroundActive) {
-                for (UIWindow *window in windowScene.windows) {
-                    if (window.isKeyWindow) {
-                        keyWindow = window;
-                        break;
-                    }
-                }
+        [FaceSDKSwiftManager showAddFaceByCamera:faceID :performanceMode :needConfirm :^(NSNumber * _Nonnull resultCode, NSString * _Nonnull feature) {
+            NSString *msg = [resultCode integerValue] == 1
+                ? [FaceSDKLocalizer text:@"Face enrollment succeeded" defaultValue:@"Face enrollment succeeded"]
+                : [FaceSDKLocalizer text:@"User canceled enrollment" defaultValue:@"User canceled enrollment"];
+            NSString *base64Str = @"";
+            if ([resultCode integerValue] == 1) {
+                base64Str = [FaceSDKSwiftManager getFaceImageBase64:faceID] ?: @"";
             }
-        }
-
-        UIViewController *rootVC = keyWindow.rootViewController;
-        if (rootVC.presentedViewController) {
-            [rootVC.presentedViewController presentViewController:vc animated:YES completion:nil];
-        } else {
-            [rootVC presentViewController:vc animated:YES completion:nil];
-        }
+            NSString *faceFeature = feature.length > 0 ? feature : ([FaceSDKSwiftManager getiOSFaceFeature:faceID] ?: @"");
+            NSDictionary *result = @{
+                @"code": resultCode,
+                @"msg": msg,
+                @"faceID": faceID ?: @"",
+                @"similarity": @(0),
+                @"liveness": @(0),
+                @"faceFeature": faceFeature,
+                @"faceBase64": base64Str
+            };
+            callback(@[result]);
+        }];
     });
+}
+
+RCT_EXPORT_METHOD(faceVerify:(NSString *)faceID
+                  threshold:(nonnull NSNumber *)threshold
+                  faceLivenessType:(nonnull NSNumber *)faceLivenessType
+                  motionLivenessTypes:(NSString *)motionLivenessTypes
+                  motionLivenessTimeOut:(nonnull NSNumber *)motionLivenessTimeOut
+                  motionLivenessSteps:(nonnull NSNumber *)motionLivenessSteps
+                  allowMultiFaces:(BOOL)allowMultiFaces
+                  callback:(RCTResponseSenderBlock)callback) {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [FaceSDKSwiftManager showFaceVerify:faceID :threshold :faceLivenessType :motionLivenessTypes :motionLivenessTimeOut :motionLivenessSteps :^(NSNumber * _Nonnull resultCode, NSNumber * _Nonnull similarity, NSNumber * _Nonnull liveness) {
+            NSString *base64Str = @"";
+            NSInteger code = [resultCode integerValue];
+            if (code == 1 || code == 10) {
+                base64Str = [FaceSDKSwiftManager getFaceImageBase64:faceID] ?: @"";
+            }
+            NSDictionary *result = @{
+                @"code": resultCode,
+                @"msg": [self getMsgByCode:code],
+                @"faceID": faceID ?: @"",
+                @"similarity": similarity,
+                @"liveness": liveness,
+                @"faceFeature": @"",
+                @"faceBase64": base64Str
+            };
+            callback(@[result]);
+        }];
+    });
+}
+
+RCT_EXPORT_METHOD(livenessVerify:(nonnull NSNumber *)faceLivenessType
+                  motionLivenessTypes:(NSString *)motionLivenessTypes
+                  motionLivenessTimeOut:(nonnull NSNumber *)motionLivenessTimeOut
+                  motionLivenessSteps:(nonnull NSNumber *)motionLivenessSteps
+                  allowMultiFaces:(BOOL)allowMultiFaces
+                  callback:(RCTResponseSenderBlock)callback) {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [FaceSDKSwiftManager showLivenessVerify:faceLivenessType :motionLivenessTypes :motionLivenessTimeOut :motionLivenessSteps :^(NSNumber * _Nonnull resultCode, NSNumber * _Nonnull liveness) {
+            NSString *base64Str = @"";
+            NSInteger code = [resultCode integerValue];
+            if (code == 1 || code == 10) {
+                base64Str = [FaceSDKSwiftManager getFaceImageBase64:@"Liveness"] ?: @"";
+            }
+            NSDictionary *result = @{
+                @"code": resultCode,
+                @"msg": [self getMsgByCode:code],
+                @"faceID": @"",
+                @"similarity": @(0),
+                @"liveness": liveness,
+                @"faceFeature": @"",
+                @"faceBase64": base64Str
+            };
+            callback(@[result]);
+        }];
+    });
+}
+
+RCT_EXPORT_METHOD(getFaceFeature:(NSString *)faceID
+                  callback:(RCTResponseSenderBlock)callback) {
+    NSString *faceFeature = [FaceSDKSwiftManager getiOSFaceFeature:faceID] ?: @"";
+    [FaceSDKSwiftManager isFaceFeatureExist:faceID :^(NSNumber * _Nonnull resultCode, NSString * _Nonnull msg) {
+        NSDictionary *result = @{
+            @"code": resultCode,
+            @"msg": msg,
+            @"faceID": faceID ?: @"",
+            @"similarity": @(0),
+            @"liveness": @(0),
+            @"faceFeature": faceFeature,
+            @"faceBase64": @""
+        };
+        callback(@[result]);
+    }];
+}
+
+RCT_EXPORT_METHOD(insertFaceFeature:(NSString *)faceID
+                  faceFeature:(NSString *)faceFeature
+                  callback:(RCTResponseSenderBlock)callback) {
+    [FaceSDKSwiftManager insertFaceFeature:faceID :faceFeature :^(NSNumber * _Nonnull resultCode, NSString * _Nonnull msg) {
+        NSDictionary *result = @{
+            @"code": resultCode,
+            @"msg": msg,
+            @"faceID": faceID ?: @"",
+            @"similarity": @(0),
+            @"liveness": @(0),
+            @"faceFeature": @"",
+            @"faceBase64": @""
+        };
+        callback(@[result]);
+    }];
+}
+
+RCT_EXPORT_METHOD(addFaceBySDKImage:(NSString *)faceID
+                  base64FaceImage:(NSString *)base64FaceImage
+                  callback:(RCTResponseSenderBlock)callback) {
+    [FaceSDKSwiftManager addFaceByBase64:faceID :base64FaceImage :^(NSNumber * _Nonnull resultCode, NSString * _Nonnull feature, NSString * _Nonnull msg) {
+        NSDictionary *result = @{
+            @"code": resultCode,
+            @"msg": msg,
+            @"faceID": faceID ?: @"",
+            @"similarity": @(0),
+            @"liveness": @(0),
+            @"faceFeature": feature ?: @"",
+            @"faceBase64": @""
+        };
+        callback(@[result]);
+    }];
+}
+
+RCT_EXPORT_METHOD(deleteFaceFeature:(NSString *)faceID
+                  callback:(RCTResponseSenderBlock)callback) {
+    [FaceSDKSwiftManager deleteFaceFeature:faceID];
+    NSDictionary *result = @{
+        @"code": @(1),
+        @"msg": [FaceSDKLocalizer text:@"Delete Success" defaultValue:@"Delete Success"],
+        @"faceID": faceID ?: @"",
+        @"similarity": @(0),
+        @"liveness": @(0),
+        @"faceFeature": @"",
+        @"faceBase64": @""
+    };
+    callback(@[result]);
 }
 
 @end
