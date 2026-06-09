@@ -97,6 +97,7 @@ npm run android
 bundle install
 bundle exec pod install
 npm run ios
+npx react-native run-ios --device  运行到真机  
 **iOS第一次运行如遇闪退，请执行pod update FaceAISDK_Core后重新运行**
 ```
 
