@@ -208,10 +208,7 @@ struct VerifyFaceView: View {
             // Check if there is a local feature value
             // 校验本地是否有特征值
             guard let faceFeature = UserDefaults.standard.string(forKey: faceID) else {
-                toastViewTips = String(
-                    format: FaceSDKLocalizer.text("No Face Feature for : %@"),
-                    faceID
-                )
+                toastViewTips = "No Face Feature for : \(faceID)"
                 showToast = true
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
@@ -226,10 +223,10 @@ struct VerifyFaceView: View {
              
              
              guard faceFeature.count >= 1024 else {
-                      toastViewTips = String(
-                          format: FaceSDKLocalizer.text("Invalid Feature length for : %@"),
-                          faceID
-                      )
+                 toastViewTips = String(
+                     format: FaceSDKLocalizer.text("Invalid Feature length for : %@"),
+                     faceID
+                 )
                  showToast = true
                  
                  DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
@@ -266,11 +263,11 @@ struct VerifyFaceView: View {
             }else{
                 showToast = true
                 
-                if FaceImageManger.saveFaceImage(faceName: faceID, faceImage: viewModel.faceVerifyResult.faceImage){
+                if FaceImageManager.saveFaceImage(faceName: faceID, faceImage: viewModel.faceVerifyResult.faceImage){
                     print("saveFaceImage success ")
                 }
 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     withAnimation {
                         showToast = false
                     }
