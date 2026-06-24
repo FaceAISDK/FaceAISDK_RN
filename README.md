@@ -1,6 +1,7 @@
 # FaceAISDK React Native Demo
 
-FaceAISDK 人脸识别、活体检测 React Native 演示项目，支持 iOS 和 Android 双端。所有功能无需后台API服务可完全离线运行。
+FaceAISDK 人脸识别、活体检测 React Native 演示项目，支持 iOS 和 Android 双端，所有功能无需后台API服务可完全离线运行。
+本SDK demo需要摄像头，需要真机非模拟器运行才能查看效果
 
 ## 功能列表
 
