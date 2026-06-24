@@ -26,7 +26,7 @@ function loadSdk() {
     },
   }));
 
-  return require('../packages/react-native-face-ai-sdk/src');
+  return require('../src');
 }
 
 describe('react-native-face-ai-sdk public API', () => {

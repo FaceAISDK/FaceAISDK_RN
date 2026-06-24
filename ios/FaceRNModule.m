@@ -8,7 +8,7 @@
 #import "FaceRNModule.h"
 #import <UIKit/UIKit.h>
 
-#import "FaceRN-Swift.h"
+#import "FaceAISDKReactNative-Swift.h"
 
 @implementation FaceRNModule
 

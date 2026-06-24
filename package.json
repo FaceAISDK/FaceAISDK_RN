@@ -1,22 +1,48 @@
 {
-  "name": "FaceRN",
-  "version": "0.0.1",
-  "private": true,
+  "name": "react-native-face-ai-sdk",
+  "version": "0.1.0",
+  "description": "React Native bindings for FaceAISDK offline face enrollment, verification, and liveness detection.",
+  "license": "UNLICENSED",
+  "source": "src/index.ts",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "react-native": "src/index.ts",
+  "files": [
+    "src",
+    "lib",
+    "android",
+    "ios",
+    "react-native-face-ai-sdk.podspec",
+    "README.md"
+  ],
   "scripts": {
-    "android": "react-native run-android",
-    "ios": "react-native run-ios",
-    "lint": "eslint .",
-    "package:build": "npx tsc -p packages/react-native-face-ai-sdk/tsconfig.build.json",
-    "package:typecheck": "npx tsc -p packages/react-native-face-ai-sdk/tsconfig.build.json --noEmit",
-    "package:pack": "npm pack ./packages/react-native-face-ai-sdk",
-    "start": "react-native start",
-    "test": "jest"
+    "build": "tsc -p tsconfig.build.json",
+    "clean": "rm -rf lib",
+    "typecheck": "tsc -p tsconfig.build.json --noEmit",
+    "prepare": "npm run clean && npm run build",
+    "test": "jest --runInBand",
+    "lint": "eslint src __tests__",
+    "pack": "npm pack .",
+    "package:build": "npm run build",
+    "package:typecheck": "npm run typecheck",
+    "package:pack": "npm run pack",
+    "start": "npm --prefix example run start",
+    "android": "npm --prefix example run android",
+    "ios": "npm --prefix example run ios",
+    "pods:install": "npm --prefix example run pods:install",
+    "example:test": "npm --prefix example run test"
   },
-  "dependencies": {
-    "@react-native/new-app-screen": "0.84.0",
-    "react": "19.2.3",
-    "react-native": "0.84.0",
-    "react-native-safe-area-context": "^5.5.2"
+  "keywords": [
+    "react-native",
+    "ios",
+    "android",
+    "face recognition",
+    "liveness",
+    "face ai sdk"
+  ],
+  "peerDependencies": {
+    "react": "*",
+    "react-native": ">=0.76"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
@@ -36,6 +62,9 @@
     "ios-deploy": "^1.12.2",
     "jest": "^29.6.3",
     "prettier": "2.8.8",
+    "react": "19.2.3",
+    "react-native": "0.84.0",
+    "react-native-safe-area-context": "^5.5.2",
     "react-test-renderer": "19.2.3",
     "typescript": "^5.8.3"
   },
