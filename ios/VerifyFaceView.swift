@@ -253,7 +253,7 @@ struct VerifyFaceView: View {
             // Clear manual tips, use SDK results
             // 清空手动的 tips，使用 SDK 的结果
             toastViewTips = ""
-            
+
             if newValue == VerifyResultCode.COLOR_LIVENESS_LIGHT_TOO_HIGH{
                 // Light is too strong
                 // 光线太强了

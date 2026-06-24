@@ -67,7 +67,6 @@ struct FaceAINaviView: View {
                                 motionLivenessTimeOut: 11,
                                 // Number of motion steps.  动作步骤个数。
                                 motionLivenessSteps:2,
-                                
                                 onDismiss: {code, similarity, liveness in
                                     print("🎆 Face Verify  Status: \(code), Similarity: \(similarity), Liveness: \(liveness)")
                                 }
@@ -87,6 +86,9 @@ struct FaceAINaviView: View {
                                 motionLivenessTimeOut: 5,
                                 // Number of motion steps. 动作步骤个数。
                                 motionLivenessSteps:2,
+
+                                //show Result Tips? For Flutter,RN,UNIApp plugin
+                                showResultTips: true,
                                 onDismiss: { code,liveness in
                                     print("🎆 Liveness Result: \(code), Liveness Score: \(liveness)")
                                 }

@@ -176,7 +176,7 @@ public class FaceSDKSwiftManager: NSObject {
 	                }
 	            )
 	            sdkView.autoControlBrightness = false
-	            
+
 	            let hostingController = UIHostingController(rootView: sdkView)
 	            hostingController.modalPresentationStyle = .fullScreen
 	            topVC.present(hostingController, animated: true)
