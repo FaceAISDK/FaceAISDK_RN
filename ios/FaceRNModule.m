@@ -22,24 +22,24 @@ RCT_EXPORT_MODULE();
     return dispatch_get_main_queue();
 }
 
-//Key 应该改为Face_Tips_Code_ 加上code拼接去Localizable.strings 取国际化的中英文字符，当前Default值是正确的
+//结果Code 对应含义message 返回给插件调用方
 - (NSString *)getMsgByCode:(NSInteger)code {
     switch (code) {
-        case 0: return [FaceSDKLocalizer text:@"User canceled/interrupted" defaultValue:@"User canceled/interrupted"];
-        case 1: return [FaceSDKLocalizer text:@"Operation succeeded" defaultValue:@"Operation succeeded"];
-        case 2: return [FaceSDKLocalizer text:@"Low face similarity (verification failed)" defaultValue:@"Low face similarity (verification failed)"];
-        case 3: return [FaceSDKLocalizer text:@"Motion liveness passed" defaultValue:@"Motion liveness passed"];
-        case 4: return [FaceSDKLocalizer text:@"Motion liveness timeout" defaultValue:@"Motion liveness timeout"];
-        case 5: return [FaceSDKLocalizer text:@"No face detected repeatedly" defaultValue:@"No face detected repeatedly"];
-        case 6: return [FaceSDKLocalizer text:@"No local face feature found" defaultValue:@"No local face feature found"];
-        case 7: return [FaceSDKLocalizer text:@"Color liveness passed" defaultValue:@"Color liveness passed"];
-        case 8: return [FaceSDKLocalizer text:@"Color liveness failed" defaultValue:@"Color liveness failed"];
-        case 9: return [FaceSDKLocalizer text:@"Ambient light too strong (color failed)" defaultValue:@"Ambient light too strong (color failed)"];
-        case 10: return [FaceSDKLocalizer text:@"All liveness checks passed" defaultValue:@"All liveness checks passed"];
-        case 11: return [FaceSDKLocalizer text:@"Silent liveness failed" defaultValue:@"Silent liveness failed"];
-        case 12: return [FaceSDKLocalizer text:@"No enrolled face information" defaultValue:@"No enrolled face information"];
-        case 13: return [FaceSDKLocalizer text:@"Multiple faces detected" defaultValue:@"Multiple faces detected"];
-        default: return [FaceSDKLocalizer text:@"Unknown status code" defaultValue:@"Unknown status code"];
+        case 0: return @"User canceled/interrupted";
+        case 1: return @"Operation succeeded";
+        case 2: return @"Low face similarity (verification failed)";
+        case 3: return @"Motion liveness passed";
+        case 4: return @"Motion liveness timeout";
+        case 5: return @"No face detected repeatedly";
+        case 6: return @"No local face feature found";
+        case 7: return @"Color liveness passed";
+        case 8: return @"Color liveness failed";
+        case 9: return @"Ambient light too strong (color failed)";
+        case 10: return @"All liveness checks passed";
+        case 11: return @"Silent liveness failed";
+        case 12: return @"No enrolled face information";
+        case 13: return @"Multiple faces detected";
+        default: return @"Unknown status code";
     }
 }
 
@@ -50,8 +50,8 @@ RCT_EXPORT_METHOD(addFaceBySDKCamera:(NSString *)faceID
     dispatch_async(dispatch_get_main_queue(), ^{
         [FaceSDKSwiftManager showAddFaceByCamera:faceID :performanceMode :needConfirm :^(NSNumber * _Nonnull resultCode, NSString * _Nonnull feature) {
             NSString *msg = [resultCode integerValue] == 1
-                ? [FaceSDKLocalizer text:@"Face enrollment succeeded" defaultValue:@"Face enrollment succeeded"]
-                : [FaceSDKLocalizer text:@"User canceled enrollment" defaultValue:@"User canceled enrollment"];
+                ? @"Face enrollment succeeded"
+                : @"User canceled enrollment";
             NSString *base64Str = @"";
             if ([resultCode integerValue] == 1) {
                 base64Str = [FaceSDKSwiftManager getFaceImageBase64:faceID] ?: @"";
@@ -184,7 +184,7 @@ RCT_EXPORT_METHOD(deleteFaceFeature:(NSString *)faceID
     [FaceSDKSwiftManager deleteFaceFeature:faceID];
     NSDictionary *result = @{
         @"code": @(1),
-        @"msg": [FaceSDKLocalizer text:@"Delete Success" defaultValue:@"Delete Success"],
+        @"msg": @"Delete Success",
         @"faceID": faceID ?: @"",
         @"similarity": @(0),
         @"liveness": @(0),
