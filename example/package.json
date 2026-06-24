@@ -1,0 +1,19 @@
+{
+  "name": "face-ai-sdk-example",
+  "private": true,
+  "version": "0.0.1",
+  "scripts": {
+    "start": "node ../node_modules/react-native/cli.js start --config metro.config.js",
+    "android": "node ../node_modules/react-native/cli.js run-android --no-packager",
+    "ios": "node ../node_modules/react-native/cli.js run-ios",
+    "pods:install": "./pod-install.sh",
+    "test": "node ../node_modules/jest/bin/jest.js --config jest.config.js --runInBand --passWithNoTests"
+  },
+  "dependencies": {
+    "react": "19.2.3",
+    "react-native": "0.84.0",
+    "react-native-face-ai-sdk": "file:..",
+    "react-native-safe-area-context": "^5.5.2"
+  }
+}
+

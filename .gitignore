@@ -4,7 +4,6 @@
 .LSOverride
 Icon
 
-
 # Thumbnails
 ._*
 
@@ -17,23 +16,15 @@ Icon
 .VolumeIcon.icns
 .com.apple.timemachine.donotpresent
 
-# Directories potentially created on remote AFP share
-.AppleDB
-.AppleDesktop
-Network Trash Folder
-Temporary Items
-.apdisk
-
 # Node.js
-node_modules/
+**/node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+lerna-debug.log*
+*.log
 *.tgz
-package-lock.json
-yarn.lock
-pnpm-lock.yaml
 
 # React Native
 *.jsbundle
@@ -41,23 +32,24 @@ pnpm-lock.yaml
 lib/
 
 # Android
-android/app/build/
-android/build/
-.gradle/
-local.properties
+**/android/app/build/
+**/android/build/
+**/.gradle/
+**/local.properties
 *.iml
 *.hprof
-.cxx/
+**/.cxx/
 *.keystore
 !debug.keystore
-.kotlin/
-captures/
+**/.kotlin/
+**/captures/
 
 # iOS (Xcode)
-ios/build/
-ios/DerivedData/
-ios/Pods/
-ios/.xcode.env.local
+**/ios/build/
+**/ios/DerivedData/
+**/ios/Pods/
+**/*.xcworkspace/xcuserdata/
+**/ios/.xcode.env.local
 *.pbxuser
 !default.pbxuser
 *.mode1v3
@@ -79,12 +71,9 @@ xcuserdata/
 **/fastlane/screenshots
 **/fastlane/test_output
 
-# Bundle artifact
-# (Already covered above)
-
 # Ruby / CocoaPods
-vendor/bundle/
-.bundle/
+**/vendor/bundle/
+**/.bundle/
 
 # IDEs
 .idea/
@@ -102,10 +91,19 @@ vendor/bundle/
 .env*.local
 
 # Testing
-coverage/
-__snapshots__/
+**/coverage/
+**/__snapshots__/
 
 # Temporary files
 tmp/
+**/tmp/
 .temp/
 .build/
+example/.build/
+
+# Example app local artifacts
+example/android/.gradle/
+example/android/.kotlin/
+example/android/app/.cxx/
+example/ios/FaceRN.xcworkspace/xcuserdata/
+
