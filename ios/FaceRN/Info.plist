@@ -37,6 +37,8 @@
 	<string>用于定位服务</string>
 	<key>NSCameraUsageDescription</key>
 	<string>需要使用相机进行人脸识别和活体检测</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>需要访问相册以选择人脸图片进行识别</string>
 	<key>RCTNewArchEnabled</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

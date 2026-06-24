@@ -44,7 +44,7 @@ function App() {
   const faceVerify = () => {
     FaceRNModule.faceVerify(
       'yourFaceID',
-      0.84, // 阈值 [0.75, 0.95]
+      0.83, // 阈值 [0.75, 0.95]
       1, // 1.动作活体 2.动作+炫彩 3.炫彩 4.静默
       '1,2,3,4,5', // 动作种类: 1.张嘴 2.微笑 3.眨眼 4.摇头 5.点头
       7, // 超时时间(秒)
@@ -59,7 +59,7 @@ function App() {
     );
   };
 
-  // 3. 活体检测
+  // 3. 活体检测。炫彩活体不能在太亮的光线环境下使用
   const livenessVerify = () => {
     FaceRNModule.livenessVerify(
       2, // 1.动作活体 2.动作+炫彩 3.炫彩 4.静默

@@ -25,7 +25,7 @@ public struct AddFaceByCamera: View {
     private func localizedTip(for code: Int) -> String {
         let key = "Face_Tips_Code_\(code)"
         let defaultValue = "Add Face Tips Code=\(code)"
-        let tipsString = FaceSDKLocalizer.text(key, defaultValue: defaultValue)
+        let tipsString = NSLocalizedString(key, value: defaultValue, comment: "")
         if code != 0 && code != 1 && code != 11 {
             TTSPlayer.shared.speak(tipsString)
         }
@@ -35,7 +35,7 @@ public struct AddFaceByCamera: View {
     // 统一处理人脸录入成功的逻辑
     private func handleFaceAddSuccess() {
         // Optional
-         if FaceImageManager.saveFaceImage(faceName: faceID, faceImage: viewModel.originFaceImage) {
+         if FaceImageManager.saveFaceImage(faceName: faceID, faceImage: viewModel.croppedFaceImage) {
              print("saveFaceImage success")
          }
         
@@ -145,12 +145,13 @@ struct ConfirmAddFaceDialog: View {
     
     var body: some View {
         VStack(alignment: .center, spacing: 15) {
-
-            Text(FaceSDKLocalizer.text("Confirm Add Face"))
+            
+            Text("Confirm Add Face")
                 .font(.system(size: 19, weight: .semibold))
                 .foregroundColor(Color.faceMain)
                 .padding(.top, 18)
-
+            
+            //
             Image(uiImage: viewModel.originFaceImage)
                 .resizable()
                 .scaledToFill()
@@ -162,7 +163,7 @@ struct ConfirmAddFaceDialog: View {
                 )
                 .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
 
-            Text(FaceSDKLocalizer.text("Ensure face is clear"))
+            Text("Ensure face is clear")
                 .font(.system(size: 15))
                 .foregroundColor(.gray)
                 .multilineTextAlignment(.center)
@@ -173,7 +174,7 @@ struct ConfirmAddFaceDialog: View {
                 Button(action: {
                     viewModel.reInit()
                 }) {
-                    Text(FaceSDKLocalizer.text("Retry"))
+                    Text("Retry")
                         .font(.system(size: 16, weight: .medium))
                         .frame(maxWidth: .infinity)
                         .frame(height: 45)
@@ -185,7 +186,7 @@ struct ConfirmAddFaceDialog: View {
                 Button(action: {
                     onConfirm()
                 }) {
-                    Text(FaceSDKLocalizer.text("Confirm"))
+                    Text("Confirm")
                         .font(.system(size: 16, weight: .bold))
                         .frame(maxWidth: .infinity)
                         .frame(height: 44)

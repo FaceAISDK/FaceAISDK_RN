@@ -49,7 +49,7 @@ public struct VerifyTwoFaceSimiView: View {
                             .background(Color.gray.opacity(0.1))
                             .clipShape(Circle())
                     }
-                    Text(FaceSDKLocalizer.text("Verify Two Face Similarity"))
+                    Text("Verify Two Face Similarity")
                         .font(.headline)
                     Spacer()
                 }
@@ -82,7 +82,7 @@ public struct VerifyTwoFaceSimiView: View {
 
                         // MARK: - 4. 操作按钮
                         Button(action: runComparison) {
-                            Text(FaceSDKLocalizer.text("Verify Two Face Similarity"))
+                            Text("Verify Two Face Similarity")
                                 .font(.headline).foregroundColor(.white)
                                 .frame(maxWidth: .infinity).frame(height: 55)
                                 .background(canCompare ? Color.blue : Color.gray)
@@ -120,7 +120,7 @@ public struct VerifyTwoFaceSimiView: View {
         // 监听 Model 提示状态改变，弹出 Toast
         .onChange(of: viewModel.sdkInterfaceTips.code) { code in
             if code != 0 {
-                let msg = FaceSDKLocalizer.text("Face_Tips_Code_\(code)")
+                let msg = NSLocalizedString("Face_Tips_Code_\(code)", comment: "")
                 toastMessage = msg
                 
                 // 简单约定：如果检测到人脸（Code为确认录入等）视为 success，否则视为 failure

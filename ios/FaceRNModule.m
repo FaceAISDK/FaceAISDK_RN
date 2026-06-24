@@ -22,6 +22,7 @@ RCT_EXPORT_MODULE();
     return dispatch_get_main_queue();
 }
 
+//Key 应该改为Face_Tips_Code_ 加上code拼接去Localizable.strings 取国际化的中英文字符，当前Default值是正确的
 - (NSString *)getMsgByCode:(NSInteger)code {
     switch (code) {
         case 0: return [FaceSDKLocalizer text:@"User canceled/interrupted" defaultValue:@"User canceled/interrupted"];

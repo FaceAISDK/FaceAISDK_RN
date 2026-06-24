@@ -88,7 +88,7 @@ struct FaceAINaviView: View {
                                 // Number of motion steps. 动作步骤个数。
                                 motionLivenessSteps:2,
                                 //show Result Tips? For Flutter,RN,UNIApp plugin
-                                showResultTips: true,
+                                showResultTips: false,
                                 onDismiss: { code,liveness in
                                     print("🎆 Liveness Result: \(code), Liveness Score: \(liveness)")
                                 }

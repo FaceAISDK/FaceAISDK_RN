@@ -23,7 +23,7 @@ public struct AddFaceByImage: View {
     private func localizedTip(for code: Int) -> String {
         let key = "Face_Tips_Code_\(code)"
         let defaultValue = "LivenessDetect Tips Code=\(code)"
-        return FaceSDKLocalizer.text(key, defaultValue: defaultValue)
+        return NSLocalizedString(key, value: defaultValue, comment: "")
     }
     
     public var body: some View {
@@ -45,7 +45,7 @@ public struct AddFaceByImage: View {
                     }
                     
                     // 中间标题
-                    Text(FaceSDKLocalizer.text("Add Face From Album"))
+                    Text("Add Face From Album")
                         .font(.system(size: 18, weight: .bold))
                         .foregroundColor(.black)
                     
@@ -96,7 +96,7 @@ public struct AddFaceByImage: View {
                                         .frame(width: 80, height: 80)
                                         .foregroundStyle(.tertiary)
                                     
-                                    Text(FaceSDKLocalizer.text("Select from album"))
+                                    Text("Select from album")
                                         .font(.system(size: 13))
                                         .foregroundStyle(.secondary)
                                 }
@@ -125,7 +125,7 @@ public struct AddFaceByImage: View {
                             }
                             
                         }) {
-                            Text(FaceSDKLocalizer.text("Save Face Feature"))
+                            Text("Save Face Feature")
                                 .font(.headline)
                                 .frame(maxWidth: .infinity)
                                 .frame(height: 36)

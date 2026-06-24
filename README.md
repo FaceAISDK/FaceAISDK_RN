@@ -78,13 +78,15 @@ type FaceResult = {
 
 > **Note**: 请确保已完成 [React Native 环境配置](https://reactnative.dev/docs/set-up-your-environment)。
 
+**我们已经编写了自动运行脚步，只要打开开发者模式配置好信息，终端运行./auto_run.sh 就能运行到真机**
+
 ### Step 1: 启动 Metro
 
 ```sh
 npm start
 ```
 
-### Step 2: 运行应用
+### Step 2: 运行应用，需要用真机摄像头
 
 #### Android
 
@@ -97,10 +99,14 @@ npm run android
 ```sh
 bundle install
 bundle exec pod install
-npm run ios
-npx react-native run-ios --device  运行到真机  
-**iOS第一次运行如遇闪退，请执行pod update FaceAISDK_Core后重新运行**
+# 方式一：运行到真机 (如遇多设备冲突，请指定名称)
+npx react-native run-ios --device "您的手机名称"
+
+# 方式二：如果 CLI 报错 CoreDeviceError 1000，请直接用 Xcode 打开运行
+# 打开 ios/FaceRN.xcworkspace -> 选择真机设备 -> 点击运行按钮
 ```
+**需要用真机摄像头；iOS 第一次运行如遇闪退，请执行 `pod update FaceAISDK_Core` 后重新运行。**
+
 
 ## 桥接模块 API
 
@@ -110,7 +116,7 @@ npx react-native run-ios --device  运行到真机
 |------|------|
 | `addFaceBySDKCamera(faceID, mode, showConfirm, callback)` | SDK相机录入人脸 |
 | `faceVerify(faceID, threshold, livenessType, motionTypes, timeout, steps, allowMulti, callback)` | 1:1人脸识别+活体检测 |
-| `livenessVerify(livenessType, motionTypes, timeout, steps, allowMulti, callback)` | 活体检测 |
+| `livenessVerify(livenessType, motionTypes, timeout, steps, allowMulti,showResultTips,callback)` | 活体检测 |
 | `getFaceFeature(faceID, callback)` | 查询本地人脸特征 |
 | `insertFaceFeature(faceID, faceFeature, callback)` | 同步人脸特征 |
 | `addFaceBySDKImage(faceID, base64Image, callback)` | 图片录入人脸 |
@@ -135,7 +141,7 @@ npx react-native run-ios --device  运行到真机
 Android 端通过 React Native Native Module 桥接调用 FaceAISDK，主要依赖：
 
 ```groovy
-implementation("io.github.faceaisdk:Android:2026.05.29")
+implementation("io.github.faceaisdk:Android:2026.06.21")
 implementation("com.tencent:mmkv:1.3.14")
 ```
 
