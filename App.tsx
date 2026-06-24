@@ -67,7 +67,7 @@ function App() {
       7, // 超时时间
       2, // 动作步骤数
       true, // 是否允许多人脸
-      true, // showResultTips: 是否在SDK页面内显示结果提示(Toast/弹窗)。默认为true
+      false, // showResultTips: 是否在SDK页面内显示结果提示(Toast/弹窗)。默认为true
       (result: FaceResult) => {
         Alert.alert(
           '活体检测结果',
@@ -124,7 +124,7 @@ function App() {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
-      <Text style={styles.title}>FaceAISDK Demo</Text>
+      <Text style={styles.title}>人脸识别FaceSDK Demo</Text>
       <Text style={styles.subtitle}>
         {Platform.OS === 'ios' ? 'iOS' : 'Android'}
       </Text>
