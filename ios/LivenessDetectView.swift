@@ -35,6 +35,9 @@ struct LivenessDetectView: View {
     // 动作活体个数
     let motionLivenessSteps:Int
     
+    // show Result Tips? For Flutter,RN,UNIApp plugin
+    let showResultTips:Bool
+    
     // callback status liveness score
     let onDismiss: (Int, Float) -> Void
     
@@ -43,7 +46,7 @@ struct LivenessDetectView: View {
     private func localizedTip(for code: Int) -> String {
         let key = "Face_Tips_Code_\(code)"
         let defaultValue = "LivenessDetect Tips Code=\(code)"
-        let tipsString = FaceSDKLocalizer.text(key, defaultValue: defaultValue)
+        let tipsString = NSLocalizedString(key, value: defaultValue, comment: "")
         if code != 0 && code != 1 && code != 3 {
             TTSPlayer.shared.speak(tipsString)
         }
@@ -111,7 +114,7 @@ struct LivenessDetectView: View {
             .navigationBarBackButtonHidden(true)
             .navigationBarHidden(true)
 
-             if showToast {
+             if showToast && showResultTips {
                 
                  let isSuccess = viewModel.faceVerifyResult.liveness > 0.75
                  let toastStyle: ToastStyle = isSuccess ? .success : .failure
@@ -157,7 +160,7 @@ struct LivenessDetectView: View {
                                 dismiss()
                             }
                         }) {
-                            Text(FaceSDKLocalizer.text("Confirm"))
+                            Text("Confirm")
                                 .font(.system(size: 18).bold())
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity)
@@ -211,10 +214,10 @@ struct LivenessDetectView: View {
                 showToast = true
                 
                 if FaceImageManager.saveFaceImage(faceName: "Liveness", faceImage: viewModel.faceVerifyResult.faceImage){
-                    //print("Base64: \(String(describing: FaceImageManager.faceImageToBase64(fileName:"Liveness")))")
+                    //print("Base64: \(String(describing: FaceImageManger.faceImageToBase64(fileName:"Liveness")))")
                 }
                 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                     withAnimation {
                         showToast = false
                     }

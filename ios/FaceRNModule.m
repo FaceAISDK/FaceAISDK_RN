@@ -104,9 +104,10 @@ RCT_EXPORT_METHOD(livenessVerify:(nonnull NSNumber *)faceLivenessType
                   motionLivenessTimeOut:(nonnull NSNumber *)motionLivenessTimeOut
                   motionLivenessSteps:(nonnull NSNumber *)motionLivenessSteps
                   allowMultiFaces:(BOOL)allowMultiFaces
+                  showResultTips:(BOOL)showResultTips
                   callback:(RCTResponseSenderBlock)callback) {
     dispatch_async(dispatch_get_main_queue(), ^{
-        [FaceSDKSwiftManager showLivenessVerify:faceLivenessType :motionLivenessTypes :motionLivenessTimeOut :motionLivenessSteps :^(NSNumber * _Nonnull resultCode, NSNumber * _Nonnull liveness) {
+        [FaceSDKSwiftManager showLivenessVerify:faceLivenessType :motionLivenessTypes :motionLivenessTimeOut :motionLivenessSteps :showResultTips :^(NSNumber * _Nonnull resultCode, NSNumber * _Nonnull liveness) {
             NSString *base64Str = @"";
             NSInteger code = [resultCode integerValue];
             if (code == 1 || code == 10) {

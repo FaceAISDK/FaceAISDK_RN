@@ -34,7 +34,7 @@ struct FaceAINaviView: View {
                                     print("🎆 AddFace   Status: \(result), Feature: \(feature)")
                                 }
                             )) {
-                                MenuRowView(icon: "camera.viewfinder", title: FaceSDKLocalizer.text("Add Face By Camera"))
+                                MenuRowView(icon: "camera.viewfinder", title: "Add Face By Camera")
                             }
                             
                             // 通过图片录入人脸信息
@@ -44,7 +44,7 @@ struct FaceAINaviView: View {
                                     print("🎆  AddFace  Status: \(result), Feature: \(feature ?? "")")
                                 }
                             )) {
-                                MenuRowView(icon: "photo.on.rectangle.angled", title: FaceSDKLocalizer.text("Add Face From Album"))
+                                MenuRowView(icon: "photo.on.rectangle.angled", title: "Add Face From Album")
                             }
                         }
                         .padding(.top, 20)
@@ -67,18 +67,19 @@ struct FaceAINaviView: View {
                                 motionLivenessTimeOut: 11,
                                 // Number of motion steps.  动作步骤个数。
                                 motionLivenessSteps:2,
+                                
                                 onDismiss: {code, similarity, liveness in
                                     print("🎆 Face Verify  Status: \(code), Similarity: \(similarity), Liveness: \(liveness)")
                                 }
                             )) {
-                                MenuRowView(icon: "faceid", title: FaceSDKLocalizer.text("Face Verify & Liveness"))
+                                MenuRowView(icon: "faceid", title: "Face Verify & Liveness")
                             }
                             
                             // 仅活体检测
                             NavigationLink(destination: LivenessDetectView(
                                 // 1. Motion Liveness, 2. Motion + Color, 3. Color, 4. Silent Liveness only (the first three all include silent liveness).
-                                // 1.动作活体 2.动作+炫彩 3.炫彩 4.仅静默活体(前三种都会带静默)。
-                                livenessType: 3,
+                                // 1. 动作活体 2.动作+炫彩 3.炫彩 4.仅静默活体(前三种都会带静默)。
+                                livenessType: 4,
                                 // 1. Open mouth, 2. Smile, 3. Blink, 4. Shake head, 5. Nod.
                                 // 1.张嘴 2.微笑 3.眨眼 4.摇头 5.点头。
                                 motionLiveness: "1,2,3,4,5",
@@ -86,14 +87,13 @@ struct FaceAINaviView: View {
                                 motionLivenessTimeOut: 5,
                                 // Number of motion steps. 动作步骤个数。
                                 motionLivenessSteps:2,
-
                                 //show Result Tips? For Flutter,RN,UNIApp plugin
                                 showResultTips: true,
                                 onDismiss: { code,liveness in
                                     print("🎆 Liveness Result: \(code), Liveness Score: \(liveness)")
                                 }
                             )) {
-                                MenuRowView(icon: "person.crop.circle.badge.checkmark", title: FaceSDKLocalizer.text("ONLY Liveness Detection"))
+                                MenuRowView(icon: "person.crop.circle.badge.checkmark", title: "ONLY Liveness Detection")
                             }
                         }
                         .padding(.top, 8)
@@ -108,12 +108,12 @@ struct FaceAINaviView: View {
                                 }
                                 print("\n😊FaceFeature: \(faceFeature)")
                             }) {
-                                MenuRowView(icon: "magnifyingglass.circle", title: FaceSDKLocalizer.text("Is Face Feature Exist"), showChevron: false)
+                                MenuRowView(icon: "magnifyingglass.circle", title: "Is Face Feature Exist", showChevron: false)
                             }
                             
                             // 验证两张人脸的相似度
                             NavigationLink(destination: VerifyTwoFaceSimiView()) {
-                                MenuRowView(icon: "person.2.crop.square.stack", title: FaceSDKLocalizer.text("Verify Two Face Similarity"))
+                                MenuRowView(icon: "person.2.crop.square.stack", title: "Verify Two Face Similarity")
                             }
                         }
                         .padding(.top, 8)
@@ -130,7 +130,7 @@ struct FaceAINaviView: View {
                                 }
                             }
                         }) {
-                            Text(FaceSDKLocalizer.text("About us"))
+                            Text("About us")
                                 .font(.system(size: 15, weight: .medium))
                                 .foregroundColor(Color.white.opacity(0.8))
                                 .underline()
@@ -175,7 +175,8 @@ struct FaceAINaviView: View {
 struct MenuRowView: View {
     var icon: String
     
-    var title: String
+    // 【修复点】：将 String 改为 LocalizedStringKey，这样 SwiftUI 就会自动去 Localizable.strings 查找多语言
+    var title: LocalizedStringKey
     
     var showChevron: Bool = true // 是否显示右侧的小箭头
     

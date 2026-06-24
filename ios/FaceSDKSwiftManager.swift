@@ -189,6 +189,7 @@ public class FaceSDKSwiftManager: NSObject {
 	                                      _ motionLivenessTypes: String,
 	                                      _ motionLivenessTimeOut : NSNumber,
 	                                      _ motionLivenessSteps : NSNumber,
+	                                      _ showResultTips: Bool,
 	                                      _ callback: @escaping (NSNumber, NSNumber) -> Void) {
 	    DispatchQueue.main.async {
 	        checkCameraPermission { granted in
@@ -207,6 +208,7 @@ public class FaceSDKSwiftManager: NSObject {
 	                motionLiveness: motionLivenessTypes,
 	                motionLivenessTimeOut: motionLivenessTimeOut.intValue,
 	                motionLivenessSteps: motionLivenessSteps.intValue,
+                    showResultTips: showResultTips,
 	                onDismiss: { [weak topVC] (resultCode: Int, liveness: Float) in
 	                    DispatchQueue.main.async {
 	                        ScreenBrightnessHelper.shared.restoreBrightness()

@@ -48,7 +48,7 @@ struct VerifyFaceView: View {
     private func localizedTip(for code: Int) -> String {
         let key = "Face_Tips_Code_\(code)"
         let defaultValue = "VerifyFace Tips Code=\(code)"
-        let tipsString = FaceSDKLocalizer.text(key, defaultValue: defaultValue)
+        let tipsString = NSLocalizedString(key, value: defaultValue, comment: "")
         if code != 0 && code != 1 && code != 3 {
             TTSPlayer.shared.speak(tipsString)
         }
@@ -171,7 +171,7 @@ struct VerifyFaceView: View {
                                 dismiss()
                             }
                         }) {
-                            Text(FaceSDKLocalizer.text("Confirm"))
+                            Text("Confirm")
                                 .font(.system(size: 18).bold())
                                 .foregroundColor(.white)
                                 .frame(maxWidth: .infinity)
@@ -223,10 +223,7 @@ struct VerifyFaceView: View {
              
              
              guard faceFeature.count >= 1024 else {
-                 toastViewTips = String(
-                     format: FaceSDKLocalizer.text("Invalid Feature length for : %@"),
-                     faceID
-                 )
+                 toastViewTips = "Invalid Feature length for : \(faceID)"
                  showToast = true
                  
                  DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
@@ -253,7 +250,7 @@ struct VerifyFaceView: View {
             // Clear manual tips, use SDK results
             // 清空手动的 tips，使用 SDK 的结果
             toastViewTips = ""
-
+            
             if newValue == VerifyResultCode.COLOR_LIVENESS_LIGHT_TOO_HIGH{
                 // Light is too strong
                 // 光线太强了
@@ -267,7 +264,7 @@ struct VerifyFaceView: View {
                     print("saveFaceImage success ")
                 }
 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                     withAnimation {
                         showToast = false
                     }

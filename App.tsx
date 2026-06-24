@@ -67,6 +67,7 @@ function App() {
       7, // 超时时间
       2, // 动作步骤数
       true, // 是否允许多人脸
+      true, // showResultTips: 是否在SDK页面内显示结果提示(Toast/弹窗)。默认为true
       (result: FaceResult) => {
         Alert.alert(
           '活体检测结果',

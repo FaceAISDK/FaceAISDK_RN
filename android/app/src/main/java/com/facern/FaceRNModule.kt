@@ -159,6 +159,7 @@ class FaceRNModule(reactContext: ReactApplicationContext) :
         motionLivenessTimeOut: Int,
         motionLivenessSteps: Int,
         allowMultiFaces: Boolean,
+        showResultTips: Boolean,
         callback: Callback
     ) {
         val activity = reactApplicationContext.currentActivity ?: return
@@ -177,6 +178,7 @@ class FaceRNModule(reactContext: ReactApplicationContext) :
             intent.putExtra(LivenessDetectActivity.MOTION_TIMEOUT, motionLivenessTimeOut)
             intent.putExtra(LivenessDetectActivity.MOTION_STEP_SIZE, motionLivenessSteps)
             intent.putExtra(LivenessDetectActivity.ALLOW_MULTI_FACES, allowMultiFaces)
+            intent.putExtra(LivenessDetectActivity.SHOW_RESULT_TIPS, showResultTips) //是否提示活体检测结果还是调用方待后续动作处理完毕后自行处理
             activity.startActivityForResult(intent, REQ_CODE_LIVENESS)
         }
     }
