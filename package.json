@@ -6,6 +6,9 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "lint": "eslint .",
+    "package:build": "npx tsc -p packages/react-native-face-ai-sdk/tsconfig.build.json",
+    "package:typecheck": "npx tsc -p packages/react-native-face-ai-sdk/tsconfig.build.json --noEmit",
+    "package:pack": "npm pack ./packages/react-native-face-ai-sdk",
     "start": "react-native start",
     "test": "jest"
   },

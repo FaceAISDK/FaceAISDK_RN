@@ -1,6 +1,8 @@
 # FaceAISDK React Native Demo
 
 FaceAISDK 人脸识别、活体检测 React Native 演示项目，支持 iOS 和 Android 双端，所有功能无需后台API服务可完全离线运行。
+
+仓库现已拆分出一个可发布插件目录：`packages/react-native-face-ai-sdk/`。根目录继续作为 Demo App 使用，`App.tsx` 通过该插件目录暴露的 Promise 风格 API 进行调用，便于后续 npm 发布与外部项目接入。
 本SDK demo需要摄像头，需要真机非模拟器运行才能查看效果
 
 ## 功能列表
@@ -52,33 +54,24 @@ type FaceResult = {
 
 ## 项目结构
 
-```
+```text
 ├── App.tsx                      # RN 主页面（统一双端调用）
-├── android/
-│   └── app/src/main/java/com/facern/
-│       ├── MainActivity.kt       # Android 主 Activity
-│       ├── MainApplication.kt    # 注册 FaceRNPackage
-│       ├── FaceRNModule.kt       # FaceAISDK 原生桥接模块
-│       └── FaceRNPackage.kt      # React Native Package 注册
+├── packages/
+│   └── react-native-face-ai-sdk/ # 可发布 RN 原生插件目录（JS API + iOS/Android 原生代码）
+├── android/                     # Android 原生工程及桥接层
 ├── ios/
-│   ├── FaceRNModule.h            # iOS 桥接模块头文件
-│   ├── FaceRNModule.m            # iOS 原生桥接模块
-│   ├── FaceSDKSwiftManager.swift # Swift 层核心管理器
-│   └── ...                       # SDK 视图组件
+│   ├── FaceAISDK/               # 原生 Swift 视图组件及工具 (新增)
+│   ├── Resources/               # 资源文件及多语言 strings (新增)
+│   ├── FaceRNModule.m           # Objective-C 桥接实现
+│   ├── FaceSDKSwiftManager.swift # Swift 业务逻辑核心
+│   └── FaceRN-Bridging-Header.h # 混编头文件
 ```
-
-## 环境要求
-
-- React Native 0.84+
-- iOS 15.0+
-- Android minSdkVersion 21+
-- Node.js >= 22.11.0
 
 ## Getting Started
 
 > **Note**: 请确保已完成 [React Native 环境配置](https://reactnative.dev/docs/set-up-your-environment)。
 
-**我们已经编写了自动运行脚步，只要打开开发者模式配置好信息，终端运行./auto_run.sh 就能运行到真机**
+**我们已经编写了自动运行脚步，只要打开开发者模式配置好信息，终端运行 ./auto_run.sh 就能运行到真机**
 
 ### Step 1: 启动 Metro
 
@@ -86,16 +79,14 @@ type FaceResult = {
 npm start
 ```
 
-### Step 2: 运行应用，需要用真机摄像头
+### Step 2: 运行应用 (需要用真机摄像头)
 
 #### Android
-
 ```sh
 npm run android
 ```
 
 #### iOS
-
 ```sh
 bundle install
 bundle exec pod install
@@ -116,42 +107,27 @@ npx react-native run-ios --device "您的手机名称"
 |------|------|
 | `addFaceBySDKCamera(faceID, mode, showConfirm, callback)` | SDK相机录入人脸 |
 | `faceVerify(faceID, threshold, livenessType, motionTypes, timeout, steps, allowMulti, callback)` | 1:1人脸识别+活体检测 |
-| `livenessVerify(livenessType, motionTypes, timeout, steps, allowMulti,showResultTips,callback)` | 活体检测 |
+| `livenessVerify(livenessType, motionTypes, timeout, steps, allowMulti, showResultTips, callback)` | 活体检测 |
 | `getFaceFeature(faceID, callback)` | 查询本地人脸特征 |
 | `insertFaceFeature(faceID, faceFeature, callback)` | 同步人脸特征 |
 | `addFaceBySDKImage(faceID, base64Image, callback)` | 图片录入人脸 |
 | `deleteFaceFeature(faceID, callback)` | 删除人脸特征 |
 
-### 参数说明
+---
 
-| 参数 | 类型 | 说明 |
-|------|------|------|
-| `faceID` | string | 人脸唯一标识 |
-| `mode` | number | 1=快速模式 2=精确模式 |
-| `showConfirm` | boolean | 是否显示确认弹窗 |
-| `threshold` | number | 相似度阈值 [0.8, 0.9] |
-| `livenessType` | number | 1=动作活体 2=动作+炫彩 3=炫彩 4=静默 |
-| `motionTypes` | string | 动作种类: "1,2,3,4,5" (张嘴/微笑/眨眼/摇头/点头) |
-| `timeout` | number | 超时时间(秒) |
-| `steps` | number | 动作步骤数 |
-| `allowMulti` | boolean | 是否允许多人脸 |
+## 插件目录开发与发布
 
-## Android 集成说明
+- 插件目录：`packages/react-native-face-ai-sdk/`
+- 插件入口：`packages/react-native-face-ai-sdk/src/index.ts`
+- iOS Podspec：`packages/react-native-face-ai-sdk/react-native-face-ai-sdk.podspec`
+- Android 模块：`packages/react-native-face-ai-sdk/android/`
 
-Android 端通过 React Native Native Module 桥接调用 FaceAISDK，主要依赖：
+常用命令：
 
-```groovy
-implementation("io.github.faceaisdk:Android:2026.06.21")
-implementation("com.tencent:mmkv:1.3.14")
+```sh
+npx tsc -p packages/react-native-face-ai-sdk/tsconfig.build.json
+npm pack ./packages/react-native-face-ai-sdk
 ```
 
-注：Android直接把原生Demo lib打包成AAR引进了，需要修改样式请修改原生Android代码后重新引入
+更完整的改造说明见《`插件封装与npm发布指南.md`》。 
 
-## iOS 集成说明
-
-iOS 端通过 `FaceRNModule` (Objective-C) 桥接调用 FaceAISDK_Core (Swift)。使用 CocoaPods 管理依赖。
-
-## 参考
-
-- [FaceAISDK Android](https://github.com/FaceAISDK/FaceAISDK_Android)
-- [FaceAISDK iOS](https://github.com/FaceAISDK/FaceAISDK_iOS)

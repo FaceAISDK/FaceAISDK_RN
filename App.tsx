@@ -4,13 +4,23 @@ import {
   View,
   TouchableOpacity,
   Text,
-  NativeModules,
   Alert,
   Platform,
   ScrollView,
 } from 'react-native';
 
-const {FaceRNModule} = NativeModules;
+import {
+  FACE_AI_STATUS_CODE_MAP,
+  addFaceByImage,
+  addFaceBySDKCamera,
+  deleteFaceFeature,
+  faceVerify,
+  getFaceFeature,
+  insertFaceFeature,
+  isFaceAIModuleAvailable,
+  livenessVerify,
+  type FaceResult,
+} from './packages/react-native-face-ai-sdk/src';
 
 /**
  * 统一回调结果类型
@@ -28,134 +38,128 @@ type FaceResult = {
 };
 
 function App() {
-  // 1. SDK相机录入人脸信息
-  const addFaceBySDKCamera = () => {
-    FaceRNModule.addFaceBySDKCamera(
-      'yourFaceID',
-      1, // 1.快速模式 2.精确模式
-      true, // 是否显示确认框
-      (result: FaceResult) => {
-        Alert.alert('录入人脸结果', `code: ${result.code}\nmsg: ${result.msg}`);
-      },
+  const demoFaceID = 'yourFaceID';
+  const demoFeature = '0'.repeat(1024);
+
+  const showResult = (title: string, result: FaceResult) => {
+    const codeDesc = FACE_AI_STATUS_CODE_MAP[result.code] || '未定义状态';
+
+    Alert.alert(
+      title,
+      [
+        `code: ${result.code}`,
+        `codeDesc: ${codeDesc}`,
+        `msg: ${result.msg}`,
+        `faceID: ${result.faceID}`,
+        `similarity: ${result.similarity}`,
+        `liveness: ${result.liveness}`,
+        `faceFeature长度: ${result.faceFeature?.length || 0}`,
+        `faceBase64长度: ${result.faceBase64?.length || 0}`,
+      ].join('\n'),
     );
   };
 
-  // 2. 人脸识别+活体检测
-  const faceVerify = () => {
-    FaceRNModule.faceVerify(
-      'yourFaceID',
-      0.83, // 阈值 [0.75, 0.95]
-      1, // 1.动作活体 2.动作+炫彩 3.炫彩 4.静默
-      '1,2,3,4,5', // 动作种类: 1.张嘴 2.微笑 3.眨眼 4.摇头 5.点头
-      7, // 超时时间(秒)
-      2, // 动作步骤数
-      true, // 是否允许多人脸
-      (result: FaceResult) => {
-        Alert.alert(
-          '人脸识别结果',
-          `code: ${result.code}\nmsg: ${result.msg}\nsimilarity: ${result.similarity}\nliveness: ${result.liveness}`,
-        );
-      },
-    );
-  };
-
-  // 3. 活体检测。炫彩活体不能在太亮的光线环境下使用
-  const livenessVerify = () => {
-    FaceRNModule.livenessVerify(
-      2, // 1.动作活体 2.动作+炫彩 3.炫彩 4.静默
-      '1,2,3,4,5', // 动作种类
-      7, // 超时时间
-      2, // 动作步骤数
-      true, // 是否允许多人脸
-      false, // showResultTips: 是否在SDK页面内显示结果提示(Toast/弹窗)。默认为true
-      (result: FaceResult) => {
-        Alert.alert(
-          '活体检测结果',
-          `code: ${result.code}\nmsg: ${result.msg}\nliveness: ${result.liveness}`,
-        );
-      },
-    );
-  };
-
-  // 4. 查询人脸特征
-  const getFaceFeature = () => {
-    FaceRNModule.getFaceFeature('yourFaceID', (result: FaceResult) => {
+  const runAction = async (
+    title: string,
+    action: () => Promise<FaceResult>,
+  ) => {
+    try {
+      const result = await action();
+      showResult(title, result);
+    } catch (error) {
       Alert.alert(
-        '查询人脸特征',
-        `code: ${result.code}\nmsg: ${result.msg}\nfaceFeature长度: ${result.faceFeature?.length || 0}`,
+        `${title}失败`,
+        error instanceof Error ? error.message : '未知错误',
       );
-    });
+    }
   };
 
-  // 5. 同步人脸特征
-  const insertFaceFeature = () => {
-    FaceRNModule.insertFaceFeature(
-      'yourFaceID',
-      'faceFeature_1024_length_string',
-      (result: FaceResult) => {
-        Alert.alert('同步人脸特征', `code: ${result.code}\nmsg: ${result.msg}`);
-      },
-    );
-  };
-
-  // 6. 图片录入人脸信息
-  const addFaceByImage = () => {
-    // 实际使用时传入真实的base64图片
-    const demoBase64 = 'demo_base64_image_string';
-    FaceRNModule.addFaceBySDKImage(
-      'yourFaceID',
-      demoBase64,
-      (result: FaceResult) => {
-        Alert.alert(
-          '图片录入结果',
-          `code: ${result.code}\nmsg: ${result.msg}\nfaceFeature长度: ${result.faceFeature?.length || 0}`,
-        );
-      },
-    );
-  };
-
-  // 7. 删除人脸特征
-  const deleteFaceFeature = () => {
-    FaceRNModule.deleteFaceFeature('yourFaceID', (result: FaceResult) => {
-      Alert.alert('删除人脸特征', `code: ${result.code}\nmsg: ${result.msg}`);
-    });
-  };
+  const demoBase64 = 'demo_base64_image_string';
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
       <Text style={styles.title}>人脸识别FaceSDK Demo</Text>
       <Text style={styles.subtitle}>
-        {Platform.OS === 'ios' ? 'iOS' : 'Android'}
+        {Platform.OS === 'ios' ? 'iOS' : 'Android'} · {isFaceAIModuleAvailable() ? '插件已连接' : '插件未连接'}
       </Text>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}>
-        <TouchableOpacity style={styles.button} onPress={addFaceBySDKCamera}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() =>
+            runAction('录入人脸结果', () =>
+              addFaceBySDKCamera(demoFaceID, {
+                mode: 1,
+                showConfirm: true,
+              }),
+            )
+          }>
           <Text style={styles.buttonText}>SDK相机录入人脸信息</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button} onPress={faceVerify}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() =>
+            runAction('人脸识别结果', () =>
+              faceVerify(demoFaceID, {
+                threshold: 0.83,
+                livenessType: 1,
+                motionTypes: '1,2,3,4,5',
+                timeout: 7,
+                steps: 2,
+                allowMultiFaces: true,
+              }),
+            )
+          }>
           <Text style={styles.buttonText}>人脸识别+活体检测</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button} onPress={livenessVerify}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() =>
+            runAction('活体检测结果', () =>
+              livenessVerify({
+                livenessType: 2,
+                motionTypes: '1,2,3,4,5',
+                timeout: 7,
+                steps: 2,
+                allowMultiFaces: true,
+                showResultTips: false,
+              }),
+            )
+          }>
           <Text style={styles.buttonText}>检测人脸是否活体</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button} onPress={getFaceFeature}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => runAction('查询人脸特征', () => getFaceFeature(demoFaceID))}>
           <Text style={styles.buttonText}>查询人脸特征信息</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button} onPress={insertFaceFeature}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() =>
+            runAction('同步人脸特征', () =>
+              insertFaceFeature(demoFaceID, demoFeature),
+            )
+          }>
           <Text style={styles.buttonText}>同步人脸特征信息</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button} onPress={addFaceByImage}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() =>
+            runAction('图片录入结果', () => addFaceByImage(demoFaceID, demoBase64))
+          }>
           <Text style={styles.buttonText}>图片录入人脸信息</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button} onPress={deleteFaceFeature}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => runAction('删除人脸特征', () => deleteFaceFeature(demoFaceID))}>
           <Text style={styles.buttonText}>删除人脸特征信息</Text>
         </TouchableOpacity>
 

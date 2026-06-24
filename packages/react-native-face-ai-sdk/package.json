@@ -1,0 +1,37 @@
+{
+  "name": "react-native-face-ai-sdk",
+  "version": "0.1.0",
+  "description": "React Native bindings for FaceAISDK offline face enrollment, verification, and liveness detection.",
+  "license": "UNLICENSED",
+  "source": "src/index.ts",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "react-native": "src/index.ts",
+  "files": [
+    "src",
+    "lib",
+    "android",
+    "ios",
+    "react-native-face-ai-sdk.podspec",
+    "README.md"
+  ],
+  "scripts": {
+    "clean": "rm -rf lib",
+    "build": "tsc -p tsconfig.build.json",
+    "prepare": "npm run clean && npm run build",
+    "typecheck": "tsc -p tsconfig.build.json --noEmit"
+  },
+  "keywords": [
+    "react-native",
+    "ios",
+    "android",
+    "face recognition",
+    "liveness",
+    "face ai sdk"
+  ],
+  "peerDependencies": {
+    "react": "*",
+    "react-native": ">=0.76"
+  }
+}
+
