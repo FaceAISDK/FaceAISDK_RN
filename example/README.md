@@ -46,9 +46,9 @@ cd example
 
 ## 本地库接入方式
 
-示例工程通过 `example/metro.config.js` 将 `react-native-face-sdk` 解析到仓库根目录，因此可以直接这样写：
+示例工程通过 `example/metro.config.js` 将 `@faceaisdk/react-native-face-sdk` 解析到仓库根目录，因此可以直接这样写：
 
 ```ts
-import {faceVerify} from 'react-native-face-sdk';
+import {faceVerify} from '@faceaisdk/react-native-face-sdk';
 ```
 

@@ -1,102 +1,75 @@
-# 插件封装与 npm 发布指南
+# 插件开发与 npm 发布指南
 
-> 适用对象：希望把当前仓库整理为 **标准化 React Native 原生库仓**，并通过 `npm install` 在其它项目中复用的人。
+本指南面向插件的开发人员，介绍如何维护、联调测试以及向 npm 组织发布 `@faceaisdk/react-native-face-sdk`。
 
-## 改造目标
-
-当前仓库已经从“单一 Demo 工程”演进为：
-
-- **根目录**：可发布库 `react-native-face-sdk`
-- **`example/`**：示例 App / 真机联调工程
-
-这是更接近社区常见 React Native 库仓的结构，优点是：
-
-- 根目录专注发布
-- `example/` 专注验证
-- 库 API 与示例接入方式分离明确
-  
----
-
-## 一、发布前准备 (已优化)
-
-为了确保插件发布后能被顺利使用，我们已经完成了以下优化：
-
-### 1. `package.json` 完善
-- 补充了 `repository`, `homepage`, `bugs` 等元数据。
-- 指定了 `main` (编译后入口), `module`, `types` (TS类型), `react-native` (源码入口)。
-- 完善了 `files` 列表，确保 `lib`, `src`, `android`, `ios`, `.podspec` 被包含在包内。
-- 设置了正确的 `peerDependencies` (react, react-native)。
-
-### 2. 协议与忽略文件
-- 添加了 `LICENSE` (MIT)。
-- 添加了 `.npmignore`，排除了 `example/`, `.idea/`, `__tests__/` 以及 build 目录，减少包体积并保护源码。
-
-### 3. 构建流程
-- `npm run build`: 使用 `tsconfig.build.json` 将 `src/` 下的 TS 源码编译到 `lib/` 目录。
-- `npm run prepare`: 在执行 `npm publish` 或本地安装前自动运行 clean 和 build，保证 `lib/` 是最新的。
-
----
-
-## 二、发布流程
-
-### 1. 注册与登录
-如果你还没有 npm 账号，请去 [npmjs.com](https://www.npmjs.com/) 注册。然后在终端执行：
-```sh
-npm login
-```
-
-### 2. 构建产物
-在根目录执行：
-```sh
-npm run prepare
-```
-这会生成 `lib/` 目录，包含 `index.js` 和 `index.d.ts`。
-
-### 3. 本地验证 (强烈建议)
-在发布前，可以使用 `npm pack` 模拟打包过程：
-```sh
-npm pack
-```
-该命令会生成一个 `.tgz` 文件。你可以解压这个文件，检查里面的目录结构是否符合预期（应包含 `lib/`, `android/`, `ios/`, `src/`, `package.json`, `README.md`, `LICENSE`, `.podspec`）。
-
-### 4. 正式发布
-确保 `package.json` 中的 `version` 已经递增。
-```sh
-npm publish
-```
-*注：如果是作用域包（如 @yourname/sdk），请使用 `npm publish --access public`。*
-
----
-
-## 三、常见问题与注意事项
-
-### 1. 版本管理
-每次发布必须修改 `version`。推荐遵循语义化版本 (SemVer)：
-- `0.1.0` -> `0.1.1` (补丁/修复)
-- `0.1.0` -> `0.2.0` (新功能)
-- `0.1.0` -> `1.0.0` (重大更新)
-
-### 2. 原生代码变更
-如果你修改了 `ios/` 或 `android/` 下的原生代码，发布到 npm 后，使用者需要重新执行 `pod install` 并重新编译 App 才能生效。
-
-### 3. 依赖项 (Dependencies)
-- `dependencies`: 插件运行必须的库（如 `mmkv`）。
-- `peerDependencies`: 宿主 App 必须提供的库（如 `react`, `react-native`）。不要把 `react-native` 放在 `dependencies` 中。
-
----
-
-## 四、项目当前结构
+## 1. 目录结构
 
 ```text
 FaceAISDK_RN/
-├── package.json                        # 根目录：库 package
-├── tsconfig.build.json                 # 根目录：库构建配置
-├── src/                                # 根目录：TypeScript 源码 (导出 API)
-├── lib/                                # 根目录：编译后的 JS/DTS (发布核心)
-├── android/                            # 根目录：Android Library 源码
-├── ios/                                # 根目录：iOS 原生源码与资源
-├── react-native-face-sdk.podspec    # 根目录：iOS Podspec (用于 autolinking)
-├── example/                            # 开发调试用的示例工程 (不发布)
-├── README.md                           # 库的使用说明 (面向用户)
-└── LICENSE                             # 开源协议
+├── src/                             # TypeScript 对外 API 源码
+├── lib/                             # 编译后的 JS/d.ts 产物 (发布核心)
+├── android/                         # 原生 Android Library 工程
+├── ios/                             # 原生 iOS 工程与资源
+├── __tests__/                       # 单元测试
+├── example/                         # 联调验证示例 App (不发布)
+└── @faceaisdk/react-native-face-sdk.podspec
 ```
+
+## 2. 本地开发与联调 (`example/`)
+
+示例工程已经通过 `metro.config.js` 的 `extraNodeModules` 将包名直接解析到仓库根目录，实现免安装直接实时调试源码。
+
+### 快捷真机运行
+在根目录下可直接执行：
+```sh
+./auto_run.sh
+```
+
+### 手动分步运行
+1. **启动 Metro 服务**：
+   ```sh
+   npm run start
+   ```
+2. **运行 Android**：
+   ```sh
+   npm run android
+   ```
+3. **运行 iOS (真机)**：
+   ```sh
+   npm run pods:install   # 自动处理 Ruby 4 兼容与 Xcode 15 接口校验参数
+   npm run ios
+   ```
+
+---
+
+## 3. 构建与发布流程
+
+### 1. 代码检查与编译
+发布前需要确保 TS 编译无误、单元测试及 Lint 全部通过：
+```sh
+npm run typecheck    # TS 类型检查
+npm run build        # 编译生成 lib 产物
+npm test             # 运行单元测试
+```
+
+### 2. 本地打包验证
+使用 `npm pack` 在本地生成 `.tgz` 压缩包，检查压缩包内是否包含必须的原生目录、打包产物（`lib/`）和配置：
+```sh
+npm pack
+```
+
+### 3. 正式发布
+确保在官网已创建 `faceaisdk` 组织，且 `package.json` 中的版本号已递增，然后执行发布：
+```sh
+npm publish --access public
+```
+*注：由于强制 2FA 安全策略，发布时请根据终端提示或使用 `--otp=xxxxxx` 参数输入手机验证码。*
+
+---
+
+## 4. 开发注意事项
+
+1. **版本规范 (SemVer)**：严格按照 `主版本号.次版本号.修订号` 进行递增（如 Bug 修复递增最后一位，新功能递增第二位）。
+2. **依赖隔离**：核心库如 `react` 和 `react-native` 必须放在 `peerDependencies` 中，严禁放入 `dependencies`。
+3. **原生代码变更**：修改 `ios/` 或 `android/` 原生桥接层代码后，必须引导使用者重新执行 `pod install` 并重新跑原生全量编译。
+4. **Xcode 15+ 编译兼容**：对于 Swift interface 校验错误，请查阅 `example/ios/Podfile` 中对 `TensorFlowLiteSwift` 及 `RCTSwiftUI` 注入 `-no-verify-emitted-module-interface` 的处理钩子。

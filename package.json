@@ -1,6 +1,6 @@
 {
-  "name": "react-native-face-sdk",
-  "version": "0.1.0",
+  "name": "@faceaisdk/react-native-face-sdk",
+  "version": "0.1.2",
   "description": "React Native offline face enrollment, verification, and liveness detection SDK.",
   "license": "MIT",
   "author": "FaceAISDK.Service@gmail.com",
@@ -16,6 +16,7 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "react-native": "src/index.ts",
+  "sideEffects": false,
   "files": [
     "src",
     "lib",
@@ -30,6 +31,7 @@
     "clean": "rm -rf lib",
     "typecheck": "tsc -p tsconfig.build.json --noEmit",
     "prepare": "npm run clean && npm run build",
+    "prepublishOnly": "npm run typecheck && npm run lint && npm test",
     "test": "jest --runInBand",
     "lint": "eslint src __tests__",
     "pack": "npm pack .",
@@ -46,13 +48,15 @@
     "react-native",
     "ios",
     "android",
-    "face recognition",
-    "liveness",
-    "face ai sdk"
+    "face-recognition",
+    "liveness-detection",
+    "offline-face-sdk",
+    "biometrics",
+    "face-id"
   ],
   "peerDependencies": {
-    "react": "*",
-    "react-native": ">=0.76"
+    "react": ">=18.0.0",
+    "react-native": ">=0.71.0"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

@@ -1,6 +1,6 @@
 module.exports = {
   preset: 'react-native',
   moduleNameMapper: {
-    '^react-native-face-sdk$': '<rootDir>/../src',
+    '^@faceaisdk/react-native-face-sdk$': '<rootDir>/../src',
   },
 };

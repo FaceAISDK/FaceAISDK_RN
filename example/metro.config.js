@@ -14,7 +14,7 @@ const config = {
   watchFolders: [workspaceRoot],
   resolver: {
 	extraNodeModules: {
-	  'react-native-face-sdk': workspaceRoot,
+	  '@faceaisdk/react-native-face-sdk': workspaceRoot,
 	},
 	nodeModulesPaths: [
 	  path.resolve(projectRoot, 'node_modules'),
