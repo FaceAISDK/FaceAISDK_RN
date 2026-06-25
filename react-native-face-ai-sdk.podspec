@@ -20,7 +20,7 @@ Pod::Spec.new do |s|
   s.module_name  = 'FaceAISDKReactNative'
 
   s.dependency 'React-Core'
-  s.dependency 'FaceAISDK_Core', '2026.06.21'
+  s.dependency 'FaceAISDK_Core', '2026.06.25'
   s.dependency 'TensorFlowLiteSwift', '~> 2.14.0'
 end
 
