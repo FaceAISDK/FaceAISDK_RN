@@ -9,6 +9,39 @@ FaceAISDK 人脸识别、活体检测 React Native 原生插件仓库，支持 i
 
 > **说明**：人脸识别、活体检测等功能需要摄像头，必须使用真机，不能在模拟器中验证。
 
+## 安装
+
+```sh
+npm install react-native-face-ai-sdk
+```
+
+### iOS
+
+在您的 iOS 工程目录下运行：
+
+```sh
+cd ios
+pod install
+```
+
+> **注意**：由于使用了人脸识别 SDK，您需要在 `Info.plist` 中添加相机权限描述：
+> ```xml
+> <key>NSCameraUsageDescription</key>
+> <string>我们需要访问您的相机进行人脸识别</string>
+> ```
+
+### Android
+
+1. 确保您的项目 `minSdkVersion` 至少为 24。
+2. Android 端会自动完成 Autolinking。
+
+> **注意**：由于使用了人脸识别 SDK，您需要在 `AndroidManifest.xml` 中确保有以下权限：
+> ```xml
+> <uses-permission android:name="android.permission.CAMERA" />
+> ```
+
+---
+
 ## 功能列表
 
 | 功能 | iOS | Android |

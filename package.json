@@ -1,8 +1,17 @@
 {
   "name": "react-native-face-ai-sdk",
   "version": "0.1.0",
-  "description": "React Native bindings for FaceAISDK offline face enrollment, verification, and liveness detection.",
-  "license": "UNLICENSED",
+  "description": "React Native offline face enrollment, verification, and liveness detection SDK.",
+  "license": "MIT",
+  "author": "FaceAISDK.Service@gmail.com",
+  "homepage": "https://github.com/FaceAISDK/FaceAISDK_RN",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FaceAISDK/FaceAISDK_RN.git"
+  },
+  "bugs": {
+    "url": "https://github.com/FaceAISDK/FaceAISDK_RN/issues"
+  },
   "source": "src/index.ts",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -13,7 +22,8 @@
     "android",
     "ios",
     "react-native-face-ai-sdk.podspec",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
