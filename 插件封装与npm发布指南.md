@@ -6,7 +6,7 @@
 
 当前仓库已经从“单一 Demo 工程”演进为：
 
-- **根目录**：可发布库 `react-native-face-ai-sdk`
+- **根目录**：可发布库 `react-native-face-sdk`
 - **`example/`**：示例 App / 真机联调工程
 
 这是更接近社区常见 React Native 库仓的结构，优点是：
@@ -95,7 +95,7 @@ FaceAISDK_RN/
 ├── lib/                                # 根目录：编译后的 JS/DTS (发布核心)
 ├── android/                            # 根目录：Android Library 源码
 ├── ios/                                # 根目录：iOS 原生源码与资源
-├── react-native-face-ai-sdk.podspec    # 根目录：iOS Podspec (用于 autolinking)
+├── react-native-face-sdk.podspec    # 根目录：iOS Podspec (用于 autolinking)
 ├── example/                            # 开发调试用的示例工程 (不发布)
 ├── README.md                           # 库的使用说明 (面向用户)
 └── LICENSE                             # 开源协议

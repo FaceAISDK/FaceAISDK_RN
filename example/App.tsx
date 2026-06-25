@@ -20,7 +20,7 @@ import {
   isFaceAIModuleAvailable,
   livenessVerify,
   type FaceResult,
-} from 'react-native-face-ai-sdk';
+} from 'react-native-face-sdk';
 
 function App() {
   const demoFaceID = 'yourFaceID';

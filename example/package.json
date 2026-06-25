@@ -1,5 +1,5 @@
 {
-  "name": "face-ai-sdk-example",
+  "name": "face-sdk-example",
   "private": true,
   "version": "0.0.1",
   "scripts": {
@@ -12,7 +12,7 @@
   "dependencies": {
     "react": "19.2.3",
     "react-native": "0.84.0",
-    "react-native-face-ai-sdk": "file:..",
+    "react-native-face-sdk": "file:..",
     "react-native-safe-area-context": "^5.5.2"
   }
 }

@@ -1,10 +1,10 @@
-# react-native-face-ai-sdk
+# react-native-face-sdk
 
 FaceAISDK 人脸识别、活体检测 React Native 原生插件仓库，支持 iOS 和 Android 双端，所有功能无需后台 API 服务即可离线运行。
 
 当前仓库已调整为更接近标准 RN 库仓的结构：
 
-- **根目录**：可发布插件 `react-native-face-ai-sdk`
+- **根目录**：可发布插件 `react-native-face-sdk`
 - **`example/`**：示例 App / 真机联调工程
 
 > **说明**：人脸识别、活体检测等功能需要摄像头，必须使用真机，不能在模拟器中验证。
@@ -12,7 +12,7 @@ FaceAISDK 人脸识别、活体检测 React Native 原生插件仓库，支持 i
 ## 安装
 
 ```sh
-npm install react-native-face-ai-sdk
+npm install react-native-face-sdk
 ```
 
 ### iOS
@@ -61,7 +61,7 @@ FaceAISDK_RN/
 ├── src/                             # 插件 TypeScript 对外 API
 ├── android/                         # 插件 Android Library 工程
 ├── ios/                             # 插件 iOS 原生源码与资源
-├── react-native-face-ai-sdk.podspec # iOS Podspec
+├── react-native-face-sdk.podspec # iOS Podspec
 ├── example/                         # 示例 App（真机调试、联调、回归）
 │   ├── App.tsx
 │   ├── android/
@@ -85,7 +85,7 @@ import {
   insertFaceFeature,
   addFaceByImage,
   deleteFaceFeature,
-} from 'react-native-face-ai-sdk';
+} from 'react-native-face-sdk';
 ```
 
 统一返回结构： 
@@ -143,7 +143,7 @@ npm pack .
 - `src/` / `lib/`
 - `android/`
 - `ios/`
-- `react-native-face-ai-sdk.podspec`
+- `react-native-face-sdk.podspec`
 
 ## `example/`：作为示例 App 运行
 
@@ -213,7 +213,7 @@ npm run pods:install
 `example/App.tsx` 使用包名方式调用本地根库：
 
 ```ts
-import {faceVerify} from 'react-native-face-ai-sdk';
+import {faceVerify} from 'react-native-face-sdk';
 ```
 
 并通过 `example/metro.config.js` 将该包名解析到仓库根目录源码，便于在本地开发时即时调试。

@@ -1,5 +1,5 @@
 {
-  "name": "react-native-face-ai-sdk",
+  "name": "react-native-face-sdk",
   "version": "0.1.0",
   "description": "React Native offline face enrollment, verification, and liveness detection SDK.",
   "license": "MIT",
@@ -21,7 +21,7 @@
     "lib",
     "android",
     "ios",
-    "react-native-face-ai-sdk.podspec",
+    "react-native-face-sdk.podspec",
     "README.md",
     "LICENSE"
   ],
