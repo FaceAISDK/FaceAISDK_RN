@@ -88,7 +88,7 @@ import {
 } from 'react-native-face-ai-sdk';
 ```
 
-统一返回结构：
+统一返回结构： 
 
 ```ts
 export interface FaceResult {
