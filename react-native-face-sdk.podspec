@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
     'ios/Resources/**/*',
   ]
   s.requires_arc = true
-  s.swift_version = '5.0'
+  s.swift_version = '5.9'
   s.module_name  = 'FaceAISDKReactNative'
 
   s.dependency 'React-Core'
