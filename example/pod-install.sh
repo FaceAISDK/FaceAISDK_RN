@@ -5,8 +5,11 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SHIM_DIR="$ROOT_DIR/ruby_shims"
 IOS_DIR="$ROOT_DIR/ios"
+ENSURE_DEPS_SCRIPT="$ROOT_DIR/ensure-js-deps.sh"
 
 cd "$ROOT_DIR"
+
+bash "$ENSURE_DEPS_SCRIPT"
 
 if ! command -v bundle > /dev/null 2>&1; then
   echo "❌ 未找到 bundle，请先安装 Bundler。"

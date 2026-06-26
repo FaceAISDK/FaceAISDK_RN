@@ -106,7 +106,7 @@ function App() {
           onPress={() =>
             runAction('活体检测结果', () =>
               livenessVerify({
-                livenessType: 2,
+                livenessType: 1,
                 motionTypes: '1,2,3,4,5',
                 timeout: 7,
                 steps: 2,

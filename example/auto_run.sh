@@ -11,6 +11,7 @@ ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_DIR="$(cd "$ROOT_DIR/.." && pwd)"
 IOS_DIR="$ROOT_DIR/ios"
 IOS_DERIVED_DATA_DIR="$ROOT_DIR/.build/ios"
+ENSURE_DEPS_SCRIPT="$ROOT_DIR/ensure-js-deps.sh"
 HAS_FAILURE=0
 
 cd "$ROOT_DIR" || exit 1
@@ -18,6 +19,10 @@ cd "$ROOT_DIR" || exit 1
 echo "========================================"
 echo "   FaceAISDK_RN 快速运行工具"
 echo "========================================"
+
+ensure_example_js_deps() {
+    bash "$ENSURE_DEPS_SCRIPT"
+}
 
 detect_android_sdk() {
     local candidates=()
@@ -204,6 +209,12 @@ build_and_launch_ios() {
 
     echo "✅ iOS App 已完成安装并触发启动。"
 }
+
+echo "⚙️  检查 Example JavaScript 依赖..."
+if ! ensure_example_js_deps; then
+    echo "❌ Example JavaScript 依赖安装失败，请查看上方日志。"
+    exit 1
+fi
 
 echo "⚙️  检查 Android SDK 配置..."
 if ! configure_android_sdk; then

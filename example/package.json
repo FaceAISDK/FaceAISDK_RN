@@ -3,6 +3,11 @@
   "private": true,
   "version": "0.0.1",
   "scripts": {
+    "ensure:deps": "bash ./ensure-js-deps.sh",
+    "prestart": "npm run ensure:deps",
+    "preandroid": "npm run ensure:deps",
+    "preios": "npm run ensure:deps",
+    "prepods:install": "npm run ensure:deps",
     "start": "node ../node_modules/react-native/cli.js start --config metro.config.js",
     "android": "node ../node_modules/react-native/cli.js run-android --no-packager",
     "ios": "node ../node_modules/react-native/cli.js run-ios",

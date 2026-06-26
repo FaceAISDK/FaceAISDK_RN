@@ -19,10 +19,20 @@ FaceAISDK_RN/
 
 示例工程已经通过 `metro.config.js` 的 `extraNodeModules` 将包名直接解析到仓库根目录，实现免安装直接实时调试源码。
 
+同时，`example/package.json` 中的 `"@faceaisdk/react-native-face-sdk": "file:.."` 会在 `example/node_modules` 下创建指向仓库根目录的本地链接。这是给 React Native CLI、CocoaPods autolinking 和原生构建流程识别本地插件用的。
+
+> 注意：安装日志中出现 npm registry 访问，通常只是下载 `react-native`、Babel、Jest 等第三方依赖；并不代表 Example 切到了远程发布版 SDK。`example/ensure-js-deps.sh` 会打印当前实际使用的 SDK 路径。
+
 ### 快捷真机运行
 在根目录下可直接执行：
 ```sh
 ./auto_run.sh
+```
+
+首次联调或依赖被清理后，也可以先执行：
+
+```sh
+npm run dev:bootstrap
 ```
 
 ### 手动分步运行
@@ -59,12 +69,36 @@ npm pack
 ```
 **注意**：生成的 `.tgz` 文件仅供本地检查，**严禁提交到 Git 仓库**。项目中已通过 `.gitignore` 配置忽略所有 `*.tgz` 文件。
 
+推荐使用统一验证命令：
+
+```sh
+npm run release:verify
+```
+
+该命令会自动执行：
+
+1. TypeScript 类型检查
+2. 构建 `lib/` 发布产物
+3. 单元测试
+4. `npm pack --json`
+5. 将生成的 `.tgz` 临时安装到 `example/`
+6. 通过 `FACE_SDK_USE_LOCAL=0` 禁用 Metro 本地源码别名，验证 Example 能消费真实打包产物
+7. 验证结束后恢复 Example 到 `file:..` 本地联调模式
+
 ### 3. 正式发布
 确保在官网已创建 `faceaisdk` 组织，且 `package.json` 中的版本号已递增，然后执行发布：
 ```sh
 npm publish --access public
 ```
 *注：由于强制 2FA 安全策略，发布时请根据终端提示或使用 `--otp=xxxxxx` 参数输入手机验证码。*
+
+正式发布前建议先执行：
+
+```sh
+npm run publish:dry-run
+```
+
+确认发布清单、入口文件、原生目录和 npm 元数据均符合预期后，再执行正式发布。
 
 ---
 
@@ -74,7 +108,3 @@ npm publish --access public
 2. **依赖隔离**：核心库如 `react` 和 `react-native` 必须放在 `peerDependencies` 中，严禁放入 `dependencies`。
 3. **原生代码变更**：修改 `ios/` 或 `android/` 原生桥接层代码后，必须引导使用者重新执行 `pod install` 并重新跑原生全量编译。
 4. **Xcode 15+ 编译兼容**：对于 Swift interface 校验错误，请查阅 `example/ios/Podfile` 中对 `TensorFlowLiteSwift` 及 `RCTSwiftUI` 注入 `-no-verify-emitted-module-interface` 的处理钩子。
-5. **Git 忽略与产物管理**：
-   - **打包产物**：`lib/` 目录和 `npm pack` 生成的 `*.tgz` 文件应保持在 `.gitignore` 中。
-   - **临时文件**：iOS 的 `DerivedData`、`Pods` 以及 Android 的 `build/`、`.gradle/` 等本地编译中间件也不应进入版本控制。
-   - **Lock 文件**：根目录下的 `package-lock.json` 或 `yarn.lock` 建议忽略（以减小库体积），但 `example/` 目录下的 Lock 文件建议保留以保证 Demo 运行环境一致。

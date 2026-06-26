@@ -10,6 +10,30 @@ FaceAISDK 人脸识别、活体检测 React Native 原生插件，支持 iOS 和
 npm install @faceaisdk/react-native-face-sdk
 ```
 
+## 本地开发 / 联调模式
+
+仓库内的 `example/` 默认使用**本地工程代码**，不是远程 npm 版本：
+
+- `example/package.json` 使用 `"@faceaisdk/react-native-face-sdk": "file:.."`，安装后会在 `example/node_modules/@faceaisdk/react-native-face-sdk` 生成指向仓库根目录的本地链接。
+- `example/metro.config.js` 默认把 `@faceaisdk/react-native-face-sdk` 解析到仓库根目录，并监听 `src/`、`ios/`、`android/` 等本地目录。
+
+因此，执行 `./auto_run.sh` 或 `npm run ios/android/start` 时看到 npm 访问 registry，通常只是下载 React Native、Babel、Jest 等第三方依赖；SDK 本身仍使用当前仓库代码。脚本会打印实际 SDK 来源路径用于确认。
+
+常用流程：
+
+```sh
+npm run dev:bootstrap
+npm run example:bundle:ios
+./auto_run.sh
+npm run release:verify
+npm run publish:dry-run
+```
+
+- `dev:bootstrap`：安装根工程依赖，并补齐 `example/` 的本地联调依赖。
+- `example:bundle:ios`：用本地源码模式验证 Metro 是否能正常解析示例工程。
+- `release:verify`：类型检查、构建、测试后，生成本地 `.tgz`，临时安装到 `example/`，并禁用 Metro 本地源码别名来验证真实发布包可用性，结束后恢复 `file:..`。
+- `publish:dry-run`：发布前检查最终 npm 发布清单。
+
 ### iOS 配置
 
 1. 进入 iOS 目录并安装 Pod 依赖：
