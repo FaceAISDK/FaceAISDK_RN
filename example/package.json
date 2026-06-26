@@ -1,7 +1,7 @@
 {
   "name": "face-sdk-example",
   "private": true,
-0.  "version": "0.2.1",
+  "version": "0.2.2",
   "scripts": {
     "ensure:deps": "bash ./ensure-js-deps.sh",
     "prestart": "npm run ensure:deps",
