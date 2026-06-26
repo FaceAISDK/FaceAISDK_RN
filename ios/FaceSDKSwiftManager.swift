@@ -16,7 +16,15 @@ public class FaceSDKSwiftManager: NSObject {
         case .notDetermined:
             AVCaptureDevice.requestAccess(for: .video) { granted in
                 DispatchQueue.main.async {
-                    completion(granted)
+                    if granted {
+                        // 首次授权时系统权限弹窗刚关闭，立即 present 可能拿到不稳定的顶层 VC。
+                        // 延迟一小段时间再继续，确保后续能正常跳转到 LivenessDetectView。
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+                            completion(true)
+                        }
+                    } else {
+                        completion(false)
+                    }
                 }
             }
         default:

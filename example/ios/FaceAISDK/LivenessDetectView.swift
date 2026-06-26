@@ -267,7 +267,7 @@ struct LivenessDetectView: View {
         .onChange(of: viewModel.faceVerifyResult.code) { newValue in
             // 忽略默认状态（例如刚初始化或重试时变成 0），避免直接掉入底部的默认退出流程
             if newValue == VerifyResultCode.DEFAULT { return }
-            
+
             // 根据不同的 code 值来决定是否显示 toast 或者弹窗
             // 优先处理光线过强的专用弹窗
             if newValue == VerifyResultCode.COLOR_LIVENESS_LIGHT_TOO_HIGH {
