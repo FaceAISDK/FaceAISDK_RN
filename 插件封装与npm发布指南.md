@@ -53,10 +53,11 @@ npm test             # 运行单元测试
 ```
 
 ### 2. 本地打包验证
-使用 `npm pack` 在本地生成 `.tgz` 压缩包，检查压缩包内是否包含必须的原生目录、打包产物（`lib/`）和配置：
+使用 `npm pack` 在本地生成 `.tgz` 压缩包（例如 `react-native-face-ai-sdk-0.1.0.tgz`）。该文件用于检查压缩包内是否包含必须的原生目录、打包产物（`lib/`）和配置：
 ```sh
 npm pack
 ```
+**注意**：生成的 `.tgz` 文件仅供本地检查，**严禁提交到 Git 仓库**。项目中已通过 `.gitignore` 配置忽略所有 `*.tgz` 文件。
 
 ### 3. 正式发布
 确保在官网已创建 `faceaisdk` 组织，且 `package.json` 中的版本号已递增，然后执行发布：
@@ -73,3 +74,7 @@ npm publish --access public
 2. **依赖隔离**：核心库如 `react` 和 `react-native` 必须放在 `peerDependencies` 中，严禁放入 `dependencies`。
 3. **原生代码变更**：修改 `ios/` 或 `android/` 原生桥接层代码后，必须引导使用者重新执行 `pod install` 并重新跑原生全量编译。
 4. **Xcode 15+ 编译兼容**：对于 Swift interface 校验错误，请查阅 `example/ios/Podfile` 中对 `TensorFlowLiteSwift` 及 `RCTSwiftUI` 注入 `-no-verify-emitted-module-interface` 的处理钩子。
+5. **Git 忽略与产物管理**：
+   - **打包产物**：`lib/` 目录和 `npm pack` 生成的 `*.tgz` 文件应保持在 `.gitignore` 中。
+   - **临时文件**：iOS 的 `DerivedData`、`Pods` 以及 Android 的 `build/`、`.gradle/` 等本地编译中间件也不应进入版本控制。
+   - **Lock 文件**：根目录下的 `package-lock.json` 或 `yarn.lock` 建议忽略（以减小库体积），但 `example/` 目录下的 Lock 文件建议保留以保证 Demo 运行环境一致。

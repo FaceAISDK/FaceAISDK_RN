@@ -25,11 +25,17 @@ yarn-error.log*
 lerna-debug.log*
 *.log
 *.tgz
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
 
 # React Native
 *.jsbundle
 .metro-health-check*
 lib/
+src/**/*.js
+src/**/*.d.ts
+src/**/*.map
 
 # Android
 **/android/app/build/
