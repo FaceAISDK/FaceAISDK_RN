@@ -8,7 +8,7 @@
   
 ## 运行方式
 
-首次运行如果 `example/node_modules` 不存在，也不需要手动额外处理：`npm run start`、`npm run ios`、`npm run android`、`./auto_run.sh` 和 `./pod-install.sh` 现在都会先自动检查并补齐 Example 的 JavaScript 依赖（包括本地 `@faceaisdk/react-native-face-sdk` 链接），避免 Metro 出现 `Unable to resolve module`。
+首次运行无需手动处理依赖：`npm run start`、`npm run ios`、`npm run android`、`./auto_run.sh` 和 `./pod-install.sh` 都会先执行 `ensure-js-deps.sh`，自动确保仓库根目录依赖就绪、并在 `example/node_modules` 下建立指向仓库根目录的本地 SDK 软链，避免 Metro 出现 `Unable to resolve module`。
 
 在仓库根目录执行：
 
@@ -54,16 +54,20 @@ cd example
 import {faceVerify} from '@faceaisdk/react-native-face-sdk';
 ```
 
-本地联调由两层配置共同保证：
+本地联调由两部分共同保证：
 
-1. `example/package.json` 的 `"@faceaisdk/react-native-face-sdk": "file:.."`，让 React Native CLI、CocoaPods autolinking 和原生构建流程能在 `node_modules` 中识别到本地插件。
-2. `example/metro.config.js` 默认开启本地源码别名，把 Metro 的 JS 解析直接指向仓库根目录。
+1. `example/node_modules/@faceaisdk/react-native-face-sdk` 是一个指向**仓库根目录**的软链（由 `example/ensure-js-deps.sh` 自动创建/修复），让 React Native CLI、CocoaPods / Gradle autolinking 和原生构建流程都能识别本地插件。
+2. `example/metro.config.js` 通过 `watchFolders` + `nodeModulesPaths` 让 Metro 解析到仓库根目录源码与根目录依赖。
 
-如果需要验证发布包而不是本地源码，请在仓库根目录执行：
+> 示例工程**不维护自己的完整 `node_modules`**，统一复用仓库根目录依赖。这样可避免 `metro`/`react-native` 双实例导致的
+> `Unable to resolve module metro-runtime/...` 或 `Unable to resolve module @faceaisdk/react-native-face-sdk` 报错。
+> 如果误在 `example/` 下执行了 `npm install`，下次运行 `./auto_run.sh` 或 `npm run start` 时会自动清理并恢复软链。
+
+如果需要验证发布包内容（而不是本地源码），在仓库根目录执行：
 
 ```sh
 npm run release:verify
 ```
 
-该命令会临时安装 `npm pack` 生成的 `.tgz` 到 `example/`，并通过 `FACE_SDK_USE_LOCAL=0` 禁用 Metro 本地源码别名。验证结束后会自动恢复本地 `file:..` 联调模式。
+该命令只会 `npm pack` 并校验压缩包内是否包含发布必需文件，**不会改动 `example/` 的本地联调环境**。
 

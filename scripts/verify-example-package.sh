@@ -1,28 +1,19 @@
 #!/bin/bash
 
+# 发布前校验：打出 npm 压缩包，并检查其中是否包含发布所必需的产物。
+#
+# 注意：此脚本刻意「不」往 example/ 安装依赖。
+# 因为 example 采用「复用仓库根目录 node_modules + 本地 SDK 软链」的模式，
+# 一旦在 example 下执行完整 npm install，就会与根目录形成 metro/react 双实例，
+# 触发 "Unable to resolve module metro-runtime/..." 等问题。
+# 所以这里只校验 tarball 内容，绝不污染本地联调环境。
+
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-EXAMPLE_DIR="$ROOT_DIR/example"
 PACK_DIR="$ROOT_DIR/.build/npm-pack"
-BUNDLE_OUTPUT="/tmp/facern-example-ios.release.bundle"
-ASSETS_DIR="/tmp/facern-example-assets-release"
-RESTORE_NEEDED=0
-
-restore_local_example_dependency() {
-  if [ "$RESTORE_NEEDED" -eq 1 ]; then
-    echo "🔄 正在恢复 Example 的本地 file:.. SDK 链接..."
-    npm install --prefix "$EXAMPLE_DIR" --no-fund --no-audit > /dev/null
-    npm --prefix "$EXAMPLE_DIR" run ensure:deps
-  fi
-}
-
-trap restore_local_example_dependency EXIT
 
 cd "$ROOT_DIR"
-
-echo "🔍 确认 Example 当前是本地联调模式..."
-npm --prefix "$EXAMPLE_DIR" run ensure:deps
 
 echo "📦 生成 npm 压缩包..."
 rm -rf "$PACK_DIR"
@@ -30,23 +21,42 @@ mkdir -p "$PACK_DIR"
 PACK_JSON="$(npm pack --json --pack-destination "$PACK_DIR")"
 TGZ_FILE="$(printf '%s' "$PACK_JSON" | node -e 'const fs = require("fs"); const data = JSON.parse(fs.readFileSync(0, "utf8")); process.stdout.write(data[0].filename);')"
 TGZ_PATH="$PACK_DIR/$TGZ_FILE"
+echo "✅ 已生成: $TGZ_PATH"
 
-echo "🧪 临时将 Example 切换为本地 .tgz 包安装模式: $TGZ_PATH"
-RESTORE_NEEDED=1
-npm install --prefix "$EXAMPLE_DIR" --no-save --package-lock=false --no-fund --no-audit "$TGZ_PATH"
+echo "🔍 校验压缩包内容是否包含发布必需文件..."
+FILE_LIST="$(tar -tzf "$TGZ_PATH")"
 
-echo "📲 禁用 Metro 本地源码别名，验证打包产物能被 Example 正常解析..."
-(
-  cd "$EXAMPLE_DIR"
-  FACE_SDK_USE_LOCAL=0 node ../node_modules/react-native/cli.js bundle \
-    --platform ios \
-    --dev true \
-    --entry-file index.js \
-    --bundle-output "$BUNDLE_OUTPUT" \
-    --assets-dest "$ASSETS_DIR" \
-    --config metro.config.js \
-    --reset-cache
+REQUIRED=(
+  "package/package.json"
+  "package/lib/index.js"
+  "package/lib/index.d.ts"
+  "package/react-native-face-sdk.podspec"
+  "package/android/build.gradle"
+  "package/src/index.ts"
 )
 
-echo "✅ 发布包验证通过：Example 可以解析本地生成的 .tgz 包。"
+MISSING=0
+for entry in "${REQUIRED[@]}"; do
+  if printf '%s\n' "$FILE_LIST" | grep -qx "$entry"; then
+    echo "  ✓ $entry"
+  else
+    echo "  ✗ 缺失: $entry"
+    MISSING=1
+  fi
+done
+
+# iOS 原生源码（至少包含一个桥接文件）
+if printf '%s\n' "$FILE_LIST" | grep -q "^package/ios/.*\.\(m\|swift\|h\)$"; then
+  echo "  ✓ package/ios/* 原生源码"
+else
+  echo "  ✗ 缺失: package/ios/* 原生源码"
+  MISSING=1
+fi
+
+if [ "$MISSING" -ne 0 ]; then
+  echo "❌ 发布包校验失败：缺少必需文件，请检查 package.json 的 files 配置与构建产物。"
+  exit 1
+fi
+
+echo "✅ 发布包校验通过：tarball 内容完整，可用于 npm publish。"
 

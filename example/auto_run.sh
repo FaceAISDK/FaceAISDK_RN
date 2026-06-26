@@ -12,6 +12,7 @@ REPO_DIR="$(cd "$ROOT_DIR/.." && pwd)"
 IOS_DIR="$ROOT_DIR/ios"
 IOS_DERIVED_DATA_DIR="$ROOT_DIR/.build/ios"
 ENSURE_DEPS_SCRIPT="$ROOT_DIR/ensure-js-deps.sh"
+ANDROID_RUN_LOG="/tmp/facern-android-run.log"
 HAS_FAILURE=0
 
 cd "$ROOT_DIR" || exit 1
@@ -228,9 +229,11 @@ if command -v adb > /dev/null 2>&1 && adb devices | awk 'NR > 1 && $2 == "device
     ANDROID_DEVICE_ID="$(adb devices | awk 'NR > 1 && $2 == "device" { print $1; exit }')"
     echo "✅ 发现 Android 设备: $ANDROID_DEVICE_ID"
     adb reverse tcp:8081 tcp:8081 > /dev/null 2>&1 || true
-    if ! node "$REPO_DIR/node_modules/react-native/cli.js" run-android --deviceId "$ANDROID_DEVICE_ID" --no-packager; then
+    if ! node "$REPO_DIR/node_modules/react-native/cli.js" run-android --device "$ANDROID_DEVICE_ID" --no-packager 2>&1 | tee "$ANDROID_RUN_LOG"; then
         HAS_FAILURE=1
         echo "❌ Android 启动失败，请查看上方日志。"
+        echo "   完整日志: $ANDROID_RUN_LOG"
+        grep -E "(^FAILURE:|^\\* What went wrong:|Execution failed|INSTALL_FAILED|Duplicate class|defined multiple times|Unresolved reference|error )" "$ANDROID_RUN_LOG" | tail -n 20 || true
     fi
 else
     echo "❌ 未发现 Android 真机，请检查 USB 调试是否开启。"
