@@ -1,81 +1,143 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
-cd ios && pod install && cd ..
-npx react-native run-ios --device
+# @faceaisdk/react-native-face-sdk
 
-# Getting Started
+[English](#english) | [中文](#中文)
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+---
 
-## Step 1: Start the Metro Server
+## English
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+React Native offline face enrollment, verification, and liveness detection SDK. Supports iOS and Android. All functions run offline without the need for backend API services.
 
-To start Metro, run the following command from the _root_ of your React Native project (Note: Default port changed to 8765 to avoid conflicts):
+> ⚠️ **Important**: This SDK involves low-level hardware and native algorithms. **It must be tested on a physical device**; it will not function on an emulator.
 
-```bash
-# using npm
-npm start
-
-# OR using Yarn
-yarn start --port 8765
-```
-
-## Step 2: Start your Application
-
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
-
-### For Android
+### Installation
 
 ```bash
-# using npm
-npm run android
-
-# OR using Yarn
-yarn android
+npm install @faceaisdk/react-native-face-sdk
 ```
 
-### For iOS
+#### iOS Configuration
+1. Navigate to the `ios` directory and install pods:
+   ```bash
+   cd ios && pod install
+   ```
+2. Add the camera permission to your `Info.plist`:
+   ```xml
+   <key>NSCameraUsageDescription</key>
+   <string>We need access to your camera for face recognition and liveness detection.</string>
+   ```
+
+#### Android Configuration
+1. Ensure your project's `minSdkVersion` is at least **24**.
+2. Add the camera permission to your `AndroidManifest.xml`:
+   ```xml
+   <uses-permission android:name="android.permission.CAMERA" />
+   ```
+
+### API Usage
+
+```ts
+import {
+  addFaceBySDKCamera,
+  faceVerify,
+  livenessVerify,
+  getFaceFeature,
+  insertFaceFeature,
+  addFaceByImage,
+  deleteFaceFeature,
+} from '@faceaisdk/react-native-face-sdk';
+```
+
+#### 1. Enroll Face by SDK Camera
+```ts
+addFaceBySDKCamera(faceID: string, options?: { mode?: number; showConfirm?: boolean }) => Promise<FaceResult>
+```
+
+#### 2. Face Verification (1:1 + Liveness)
+```ts
+faceVerify(faceID: string, options?: FaceVerifyOptions) => Promise<FaceResult>
+```
+
+#### 3. Liveness Detection
+```ts
+livenessVerify(options?: LivenessVerifyOptions) => Promise<FaceResult>
+```
+
+### Data Structures (`FaceResult`)
+
+| Property | Type | Description |
+| :--- | :--- | :--- |
+| `code` | `number` | Status code |
+| `msg` | `string` | Message |
+| `faceID` | `string` | User identifier |
+| `similarity` | `number` | Similarity score |
+| `liveness` | `number` | Liveness score |
+| `faceFeature`| `string` | 1024-bit face feature string |
+| `faceBase64` | `string` | Base64 face image |
+
+---
+
+## 中文
+
+FaceAISDK 人脸识别、活体检测 React Native 原生插件，支持 iOS 和 Android 双端；所有功能无需后台 API 服务即可离线运行。
+
+> ⚠️ **重要提示**：本 SDK 涉及底层硬件与原生算法，**必须使用真机测试**，模拟器无法运行。
+
+### 安装
 
 ```bash
-# using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
+npm install @faceaisdk/react-native-face-sdk
 ```
 
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
+#### iOS 配置
+1. 进入 `ios` 目录并安装 Pod 依赖：
+   ```bash
+   cd ios && pod install
+   ```
+2. 在 `Info.plist` 中添加相机权限描述：
+   ```xml
+   <key>NSCameraUsageDescription</key>
+   <string>我们需要访问您的相机进行人脸识别与活体检测</string>
+   ```
 
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
+#### Android 配置
+1. 确保项目的 `minSdkVersion` 至少为 **24**。
+2. 在 `AndroidManifest.xml` 中声明相机权限：
+   ```xml
+   <uses-permission android:name="android.permission.CAMERA" />
+   ```
 
-## Step 3: Modifying your App
+### 核心方法
 
-Now that you have successfully run the app, let's modify it.
+#### 1. SDK 相机录入人脸
+```ts
+addFaceBySDKCamera(faceID: string, options?: { mode?: number; showConfirm?: boolean }) => Promise<FaceResult>
+```
 
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
+#### 2. 人脸比对 + 活体检测
+```ts
+faceVerify(faceID: string, options?: FaceVerifyOptions) => Promise<FaceResult>
+```
 
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
+#### 3. 纯活体检测
+```ts
+livenessVerify(options?: LivenessVerifyOptions) => Promise<FaceResult>
+```
 
-## Congratulations! :tada:
+### 统一返回结构 (`FaceResult`)
 
-You've successfully run and modified your React Native App. :partying_face:
+| 属性 | 类型 | 说明 |
+| :--- | :--- | :--- |
+| `code` | `number` | 状态码 |
+| `msg` | `string` | 提示文本 |
+| `faceID` | `string` | 用户标识 |
+| `similarity` | `number` | 比对相似度 |
+| `liveness` | `number` | 活体检测分值 |
+| `faceFeature`| `string` | 人脸特征值 (1024位) |
+| `faceBase64` | `string` | 人脸图片 Base64 字符串 |
 
-### Now what?
+---
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+## Support & Feedback
+Issues: [GitHub Issues](https://github.com/FaceAISDK/FaceAISDK_RN/issues)  
+Email: FaceAISDK.Service@gmail.com
