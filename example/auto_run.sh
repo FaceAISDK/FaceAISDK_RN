@@ -203,12 +203,11 @@ build_and_launch_ios() {
     fi
 
     echo "🚀 正在使用 ios-deploy 安装并启动到 $ios_name ..."
-    # 移除 --no-wifi 以避免连接限制，增加 --terminate 确保清理旧进程
+    # 移除 --no-wifi 以避免连接限制
     # 增加 --app_deltas 提高增量安装稳定性
     if ! "$REPO_DIR/node_modules/.bin/ios-deploy" \
         --id "$ios_udid" \
         --bundle "$app_path" \
-        --terminate \
         --justlaunch \
         --unbuffered 2>&1 | tee "$ios_deploy_log"; then
         if grep -q "device was not, or could not be, unlocked" "$ios_deploy_log"; then
