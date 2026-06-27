@@ -33,6 +33,7 @@ REQUIRED=(
   "package/react-native-face-sdk.podspec"
   "package/android/build.gradle"
   "package/src/index.ts"
+  "package/scripts/faceaisdk_post_install.rb"
 )
 
 MISSING=0
