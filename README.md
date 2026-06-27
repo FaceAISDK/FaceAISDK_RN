@@ -110,7 +110,35 @@ npm run publish:dry-run
    ```sh
    cd ios && pod install
    ```
-2. 在 `Info.plist` 中添加相机权限描述：
+2. **（必须）在宿主 App 的 `ios/Podfile` 中接入修复脚本。**
+   FaceAISDK_Core 为 Swift 5.9.x 预编译框架，在 Xcode 16 / Swift 6.1.x 等更新工具链下编译时，
+   需要额外的构建配置才能正确重编译其 `.swiftinterface`，否则会报：
+   ```
+   failed to build module 'FaceAISDK_Core'; this SDK is not supported by the compiler
+   (built with Apple Swift 5.9.2, compiler is Apple Swift 6.1.2)
+   cannot load underlying module for 'TensorFlowLite'
+   ```
+   在 `Podfile` 顶部 require 本插件随包提供的脚本，并在 `post_install` 中调用：
+   ```ruby
+   require_relative '../node_modules/@faceaisdk/react-native-face-sdk/scripts/faceaisdk_post_install.rb'
+
+   target 'YourApp' do
+     # ...
+     post_install do |installer|
+       react_native_post_install(installer, config[:reactNativePath], :mac_catalyst_enabled => false)
+       faceaisdk_post_install(installer)   # <-- 加这一行
+     end
+   end
+   ```
+   > 说明：该脚本会为 `TensorFlowLiteSwift` 开启 `BUILD_LIBRARY_FOR_DISTRIBUTION`，并把
+   > `Pods/Headers/Public` 暴露给 `SWIFT_INCLUDE_PATHS`、补建 TensorFlowLite 的 modulemap。
+   > 这些设置作用于「其它 Pod / 聚合 target」，无法只靠插件自身的 podspec 完成，因此必须由宿主工程接入。
+
+   接入后重新执行：
+   ```sh
+   cd ios && pod install
+   ```
+3. 在 `Info.plist` 中添加相机权限描述：
    ```xml
    <key>NSCameraUsageDescription</key>
    <string>我们需要访问您的相机进行人脸识别与活体检测</string>

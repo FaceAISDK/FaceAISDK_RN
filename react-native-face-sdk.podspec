@@ -19,10 +19,20 @@ Pod::Spec.new do |s|
   s.swift_version = '5.9'
   s.module_name  = 'FaceAISDKReactNative'
 
+  # 本插件自身（消费 FaceAISDK_Core 的 target）在更高版本工具链上编译时，需要重新
+  # 编译 FaceAISDK_Core 的 .swiftinterface，而该过程必须能发现 TensorFlowLite 的
+  # Clang modulemap。这里把 Pods/Headers/Public 暴露给本 target 的 Swift include
+  # 搜索路径。注意：对 TensorFlowLiteSwift / 聚合 target 的修复无法在 podspec 内完成，
+  # 宿主工程仍需在 Podfile 的 post_install 中调用 scripts/faceaisdk_post_install.rb。
+  s.pod_target_xcconfig = {
+    'SWIFT_INCLUDE_PATHS' => '$(inherited) "${PODS_ROOT}/Headers/Public"',
+    'OTHER_SWIFT_FLAGS'   => '$(inherited) -no-verify-emitted-module-interface'
+  }
+
   s.dependency 'React-Core'
   s.dependency 'FaceAISDK_Core', '2026.06.25'
 
-  #应该不需要重复依赖了
-  s.dependency 'TensorFlowLiteSwift', '~> 2.17.0'
+  # FaceAISDK_Core 已传递依赖 TensorFlowLiteSwift 2.17.0，此处显式声明仅为锁定版本一致。
+  s.dependency 'TensorFlowLiteSwift', '2.17.0'
 end
 

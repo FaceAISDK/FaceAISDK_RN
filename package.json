@@ -1,6 +1,6 @@
 {
   "name": "@faceaisdk/react-native-face-sdk",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "description": "React Native offline face enrollment, verification, and liveness detection SDK.",
   "license": "FaceAISDK License",
   "author": "FaceAISDK.Service@gmail.com",
@@ -20,8 +20,12 @@
   "files": [
     "src",
     "lib",
-    "android",
     "ios",
+    "android/src",
+    "android/libs",
+    "android/build.gradle",
+    "android/proguard-rules.pro",
+    "scripts/faceaisdk_post_install.rb",
     "react-native-face-sdk.podspec",
     "README.md",
     "LICENSE"
