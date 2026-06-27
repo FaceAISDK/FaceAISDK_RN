@@ -26,6 +26,15 @@ npm install @faceaisdk/react-native-face-sdk
    <key>NSCameraUsageDescription</key>
    <string>We need access to your camera for face recognition and liveness detection.</string>
    ```
+3. Update your `ios/Podfile` to include the SDK post-install hook:
+   ```ruby
+   require_relative '../node_modules/@faceaisdk/react-native-face-sdk/scripts/faceaisdk_post_install.rb'
+
+   post_install do |installer|
+     react_native_post_install(installer, config[:reactNativePath], :mac_catalyst_enabled => false)
+     faceaisdk_post_install(installer)
+   end
+   ```
 
 #### Android Configuration
 1. Ensure your project's `minSdkVersion` is at least **24**.
@@ -98,6 +107,15 @@ npm install @faceaisdk/react-native-face-sdk
    ```xml
    <key>NSCameraUsageDescription</key>
    <string>我们需要访问您的相机进行人脸识别与活体检测</string>
+   ```
+3. 在您的 `ios/Podfile` 中接入必要的脚本：
+   ```ruby
+   require_relative '../node_modules/@faceaisdk/react-native-face-sdk/scripts/faceaisdk_post_install.rb'
+
+   post_install do |installer|
+     react_native_post_install(installer, config[:reactNativePath], :mac_catalyst_enabled => false)
+     faceaisdk_post_install(installer)
+   end
    ```
 
 #### Android 配置

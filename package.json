@@ -1,7 +1,14 @@
 {
   "name": "FaceAISDK_RN",
-  "version": "0.0.1",
+  "version": "0.3.0",
   "private": true,
+  "files": [
+    "scripts",
+    "ios",
+    "android",
+    "index.js",
+    "README.md"
+  ],
   "scripts": {
     "android": "react-native run-android --port 8765",
     "ios": "react-native run-ios --port 8765",

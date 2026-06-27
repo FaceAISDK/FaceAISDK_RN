@@ -5,6 +5,9 @@ require Pod::Executable.execute_command('node', ['-p',
     {paths: [process.argv[1]]},
   )', __dir__]).strip
 
+#FaceAISDK faceaisdk_post_install.rb
+require_relative '../node_modules/@faceaisdk/react-native-face-sdk/scripts/faceaisdk_post_install.rb'
+
 platform :ios, '15.5'
 prepare_react_native_project!
 
@@ -36,20 +39,8 @@ target 'FaceAISDK_RN' do
       :mac_catalyst_enabled => false
     )
 
-    # 2. 统一处理冲突的配置
-    installer.pods_project.targets.each do |target|
-      target.build_configurations.each do |config|
-        # 统一最低支持版本
-        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.5'
-
-        # 彻底解决 "Can't merge user_target_xcconfig" 冲突
-        # 移除 Pod 中可能冲突的 EXCLUDED_ARCHS 设置，由主项目统一管理
-        config.build_settings.delete 'EXCLUDED_ARCHS[sdk=iphonesimulator*]'
-
-        # 针对真机编译的必要设置
-        config.build_settings['ENABLE_BITCODE'] = 'NO'
-      end
-    end
+    # 2. 调用 FaceAISDK 的后置处理
+    faceaisdk_post_install(installer)
   end
 
 
