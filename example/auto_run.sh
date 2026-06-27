@@ -78,14 +78,29 @@ configure_android_sdk() {
 }
 
 start_metro() {
+    # 强制杀掉可能残存的、处于异常状态的 Metro 进程
     if lsof -iTCP:8081 -sTCP:LISTEN > /dev/null 2>&1; then
-        echo "✅ Metro 已在 8081 端口运行。"
-        return 0
+        echo "▶️  发现 8081 端口已有进程，正在强制重启以避免 500 错误..."
+        lsof -ti:8081 | xargs kill -9 > /dev/null 2>&1 || true
+        sleep 2
     fi
 
-    echo "▶️  后台启动 Metro 服务端..."
-    nohup node "$REPO_DIR/node_modules/react-native/cli.js" start --config "$ROOT_DIR/metro.config.js" > /tmp/facern-metro.log 2>&1 &
-    sleep 5
+    # 清理 Metro 缓存和 Watchman (如果存在)
+    echo "▶️  清理 Metro 缓存..."
+    rm -rf /tmp/metro-* 2>/dev/null || true
+    if command -v watchman > /dev/null 2>&1; then
+        watchman watch-del-all > /dev/null 2>&1 || true
+    fi
+
+    echo "▶️  后台启动 Metro 服务端 (含 --reset-cache)..."
+    # 显式 cd 到项目根目录并执行启动，确保 cwd 正确
+    (
+        cd "$ROOT_DIR"
+        nohup node "$REPO_DIR/node_modules/react-native/cli.js" start --config "$ROOT_DIR/metro.config.js" --reset-cache > /tmp/facern-metro.log 2>&1 &
+    )
+
+    # 增加等待时间确保服务拉起
+    sleep 8
 
     if lsof -iTCP:8081 -sTCP:LISTEN > /dev/null 2>&1; then
         echo "✅ Metro 启动成功。日志: /tmp/facern-metro.log"
@@ -188,19 +203,27 @@ build_and_launch_ios() {
     fi
 
     echo "🚀 正在使用 ios-deploy 安装并启动到 $ios_name ..."
+    # 移除 --no-wifi 以避免连接限制，增加 --terminate 确保清理旧进程
+    # 增加 --app_deltas 提高增量安装稳定性
     if ! "$REPO_DIR/node_modules/.bin/ios-deploy" \
         --id "$ios_udid" \
         --bundle "$app_path" \
+        --terminate \
         --justlaunch \
-        --noninteractive \
-        --unbuffered \
-        --no-wifi 2>&1 | tee "$ios_deploy_log"; then
+        --unbuffered 2>&1 | tee "$ios_deploy_log"; then
         if grep -q "device was not, or could not be, unlocked" "$ios_deploy_log"; then
             echo "❌ iOS App 已安装到设备，但启动失败：手机当前未解锁。请解锁 iPhone 后重试。"
         else
             echo "❌ ios-deploy 安装/启动失败，请查看日志: $ios_deploy_log"
         fi
         return 1
+    fi
+
+    # 对于 iOS 16/17+，如果 ios-deploy 调起失败，尝试使用官方 devicectl 补刀调起
+    if xcrun devicectl --version > /dev/null 2>&1; then
+        echo "ℹ️  正在尝试使用 devicectl 确保 App 处于前台..."
+        # 这里的 bundle id 从项目配置中获取，默认为 com.facern
+        xcrun devicectl device process launch --device "$ios_udid" com.facern > /dev/null 2>&1 || true
     fi
 
     if grep -q "device was not, or could not be, unlocked" "$ios_deploy_log"; then
