@@ -1,132 +1,81 @@
-# @faceaisdk/react-native-face-sdk
+This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+cd ios && pod install && cd ..
+npx react-native run-ios --device
 
-FaceAISDK 人脸识别、活体检测 React Native 原生插件，支持 iOS 和 Android 双端；所有功能无需后台 API 服务即可离线运行。
+# Getting Started
 
-> ⚠️ **重要提示**：本 SDK 涉及底层硬件与原生算法，**必须使用真机测试**，模拟器无法运行。
+>**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
 
-## 安装
+## Step 1: Start the Metro Server
 
-```sh
-npm install @faceaisdk/react-native-face-sdk
+First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+
+To start Metro, run the following command from the _root_ of your React Native project (Note: Default port changed to 8765 to avoid conflicts):
+
+```bash
+# using npm
+npm start
+
+# OR using Yarn
+yarn start --port 8765
 ```
 
+## Step 2: Start your Application
 
-## 功能与 API 说明
+Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
 
-根目录导出 Promise 风格接口：
+### For Android
 
-```ts
-import {
-  addFaceBySDKCamera,
-  faceVerify,
-  livenessVerify,
-  getFaceFeature,
-  insertFaceFeature,
-  addFaceByImage,
-  deleteFaceFeature,
-} from '@faceaisdk/react-native-face-sdk';
+```bash
+# using npm
+npm run android
+
+# OR using Yarn
+yarn android
 ```
 
-### 核心方法
+### For iOS
 
-#### 1. SDK 相机录入人脸
-```ts
-addFaceBySDKCamera(faceID: string, options?: { mode?: number; showConfirm?: boolean }) => Promise<FaceResult>
-```
-- `faceID`: 用户唯一标识
-- `options`: 包含模式切换和是否展示确认弹窗。
+```bash
+# using npm
+npm run ios
 
-#### 2. 人脸比对 + 活体检测
-```ts
-faceVerify(faceID: string, options?: FaceVerifyOptions) => Promise<FaceResult>
-```
-- 包含相似度阈值、活体类型、动作序列、超时时间等配置。
-
-#### 3. 纯活体检测
-```ts
-livenessVerify(options?: LivenessVerifyOptions) => Promise<FaceResult>
-```
-- 仅检测镜头前是否为活人，不进行 1:1 比对。
-
----
-
-## 统一返回结构 (`FaceResult`)
-
-```ts
-export interface FaceResult {
-  code: number;         // 状态码
-  msg: string;          // 提示文本
-  faceID: string;       // 用户标识
-  similarity: number;   // 比对相似度
-  liveness: number;     // 活体检测分值
-  faceFeature: string;  // 人脸特征值 (1024位)
-  faceBase64: string;   // 采集到的人脸图片 Base64 字符串
-}
+# OR using Yarn
+yarn ios
 ```
 
-### 状态码 (`code`) 说明
+If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
 
-| Code | 含义 | Code | 含义 |
-|------|------|------|------|
-| **0** | 用户取消/初始化状态 | **7** | 炫彩活体成功 |
-| **1** | 人脸识别比对/录入成功 | **8** | 炫彩活体失败 |
-| **2** | 比对失败 (低于阈值) | **9** | 炫彩失败 (环境光过强) |
-| **3** | 动作活体检测成功 | **10** | 所有活体检测完成 |
-| **4** | 动作活体超时 | **11** | 静默活体检测失败 |
-| **5** | 多次未检测到人脸 | **12** | 对应人脸未录入 |
-| **6** | 对应人脸特征值不存在 | **13** | 镜头内出现多人脸 |
+This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
 
+## Step 3: Modifying your App
 
-## 本地开发 / 联调模式
+Now that you have successfully run the app, let's modify it.
 
-仓库内的 `example/` 默认使用**本地工程代码**，不是远程 npm 版本。为避免「示例工程和仓库根目录各装一份 `metro`/`react-native` 造成的双实例冲突」，采用如下精简模型：
+1. Open `App.tsx` in your text editor of choice and edit some lines.
+2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
 
-- 示例工程**不维护自己的完整 `node_modules`**，统一复用仓库根目录的 `node_modules`（`react` / `react-native` / `metro` / `jest` 等都在根目录 `devDependencies` 中）。
-- `example/node_modules` 里**只放一个软链** `@faceaisdk/react-native-face-sdk -> 仓库根目录`，用于解析 SDK 包名到本地源码。
-- `example/metro.config.js` 通过 `watchFolders` + `nodeModulesPaths` 让 Metro 同时监听仓库根目录源码与根目录依赖。
+   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
 
-上述软链与依赖检查由 `example/ensure-js-deps.sh` 自动完成，并具备**自愈能力**：如果检测到 `example/node_modules` 里出现了重复安装的 `react-native`/`metro`，会自动清理并重建软链，同时清掉 Android 旧的 autolinking 缓存。`./auto_run.sh`、`npm run start/ios/android/pods:install` 都会在执行前自动跑这一步。
+## Congratulations! :tada:
 
-> 提示：执行时若看到 npm 访问 registry，通常只是补齐仓库根目录的 React Native、Babel、Jest 等第三方依赖；SDK 本身始终指向当前仓库源码。脚本会打印实际 SDK 来源路径用于确认。
+You've successfully run and modified your React Native App. :partying_face:
 
-常用流程：
+### Now what?
 
-```sh
-npm run dev:bootstrap
-npm run example:bundle:ios
-./auto_run.sh
-npm run release:verify
-npm run publish:dry-run
-```
+- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
+- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
 
-- `dev:bootstrap`：安装仓库根目录依赖，并补齐 `example/` 的本地 SDK 软链。
-- `example:bundle:ios`：用本地源码模式验证 Metro 能否正常解析示例工程。
-- `release:verify`：类型检查、构建、测试后生成 `.tgz`，并校验压缩包内是否包含发布必需文件（`lib/`、原生目录、podspec 等）。**不会污染** `example/` 的联调环境。
-- `publish:dry-run`：发布前检查最终 npm 发布清单。
+# Troubleshooting
 
-### iOS 配置
+If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
 
-1. 进入 iOS 目录并安装 Pod 依赖：
-   ```sh
-   cd ios && pod install
-   ```
-2. 在 `Info.plist` 中添加相机权限描述：
-   ```xml
-   <key>NSCameraUsageDescription</key>
-   <string>我们需要访问您的相机进行人脸识别与活体检测</string>
-   ```
+# Learn More
 
-### Android 配置
+To learn more about React Native, take a look at the following resources:
 
-1. 确保项目的 `minSdkVersion` 至少为 **24**。
-2. 在 `AndroidManifest.xml` 中声明相机权限：
-   ```xml
-   <uses-permission android:name="android.permission.CAMERA" />
-   ```
-
-
-## 贡献与本地开发
-
-关于本地二次开发、本地示例工程运行、混合调试以及完整的 npm 发布流程，请参考开发说明文档：[插件封装与npm发布指南.md](./插件封装与npm发布指南.md)。
-
-
+- [React Native Website](https://reactnative.dev) - learn more about React Native.
+- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
+- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
+- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
+- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
