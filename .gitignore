@@ -42,23 +42,11 @@ android/app/src/debug/res/values/debug_settings.xml
 *.hprof
 
 # iOS
-ios/build/
-ios/DerivedData/
-ios/Pods/
+# Detailed rules are in ios/.gitignore
 ios/.xcode.env.local
-ios/*.xcworkspace
-ios/*.hmap
-ios/*.ipa
-**/xcuserdata/
-*.moved-aside
-*.pbxuser
-*.mode1v3
-*.mode2v3
-*.perspectivev3
-!default.pbxuser
-!default.mode1v3
-!default.mode2v3
-!default.perspectivev3
+ios/build/
+ios/Pods/
+ios/DerivedData/
 
 # Testing
 /coverage/
