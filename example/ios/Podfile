@@ -55,6 +55,19 @@ target 'FaceRN' do
           bc.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
         end
       end
+
+      # Pod targets that consume FaceAISDK_Core (e.g. react-native-face-sdk) must
+      # recompile its .swiftinterface because the prebuilt xcframework was built
+      # with an older Swift toolchain. That recompilation needs to discover the
+      # TensorFlowLite Clang modulemap, so expose Pods/Headers/Public via the
+      # Swift include paths (Xcc module-map flags are not propagated here).
+      header_path = "#{installer.sandbox.root}/Headers/Public"
+      target.build_configurations.each do |bc|
+        existing = bc.build_settings['SWIFT_INCLUDE_PATHS'] || '$(inherited)'
+        unless existing.to_s.include?(header_path)
+          bc.build_settings['SWIFT_INCLUDE_PATHS'] = "#{existing} \"#{header_path}\""
+        end
+      end
     end
 
     # Create module.modulemap for TensorFlowLite so it can be discovered during

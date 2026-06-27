@@ -125,8 +125,8 @@ npm run publish:dry-run
    ```
 
 
-## 贡献与本地开发
-
-关于本地二次开发、本地示例工程运行、混合调试以及完整的 npm 发布流程，请参考开发说明文档：[插件封装与npm发布指南.md](./插件封装与npm发布指南.md)。
+## BUG 反馈
+  运行该插件有任何问题请反馈 https://github.com/FaceAISDK/FaceAISDK_RN/issues  
+  邮箱📮：FaceAISDK.Service@gmail.com
 
 

@@ -21,11 +21,9 @@
 		A28AAEB6DF41FF48E3950478 /* FaceColorExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = B315327821056E9FAF472EC0 /* FaceColorExtensions.swift */; };
 		B0000001 /* FaceSDKLocalizer.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0000001 /* FaceSDKLocalizer.swift */; };
 		B0000002 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = F0000002 /* Localizable.strings */; };
-		B0000003 /* light_too_high.png in Resources */ = {isa = PBXBuildFile; fileRef = F0000005 /* light_too_high.png */; };
 		B6110C1849EB78A0CCBA397D /* ScreenBrightnessHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3454E9A7BD8DF6998F231F8 /* ScreenBrightnessHelper.swift */; };
 		B9CDE885E330ED7995BE644F /* LivenessDetectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FE3DBE1736CC9CA027C83229 /* LivenessDetectView.swift */; };
 		BDFA6095F6BB764CCA09C814 /* libPods-FaceRN.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 691BC83C1789C8B860D4D63E /* libPods-FaceRN.a */; };
-		CE4E2F882FC03FF400D4ABD9 /* FaceRNModule.m in Sources */ = {isa = PBXBuildFile; fileRef = CE4E2F872FC03FF400D4ABD9 /* FaceRNModule.m */; };
 		E6E49D92137489BCA29428CB /* FaceSDKCameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 776D3E8E80EFCFED99603BB6 /* FaceSDKCameraView.swift */; };
 		F28BBC944094F7EA3D23BE32 /* AddFaceByImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2911D1BFFC52468E99CF516F /* AddFaceByImage.swift */; };
 		FA857E885CD4C93ADB50281F /* FaceAINaviView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3151EB8D7C5A6E6C33A1E3DB /* FaceAINaviView.swift */; };
@@ -198,6 +196,7 @@
 			knownRegions = (
 				en,
 				Base,
+				"zh-Hans",
 			);
 			mainGroup = 83CBB9F61A601CBA00E9B192;
 			productRefGroup = 83CBBA001A601CBA00E9B192 /* Products */;
@@ -218,7 +217,6 @@
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				3FBDA94C7088034D8E1CBDE3 /* PrivacyInfo.xcprivacy in Resources */,
 				B0000002 /* Localizable.strings in Resources */,
-				B0000003 /* light_too_high.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -304,7 +302,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CE4E2F882FC03FF400D4ABD9 /* FaceRNModule.m in Sources */,
 				B0000001 /* FaceSDKLocalizer.swift in Sources */,
 				761780ED2CA45674006654EE /* AppDelegate.swift in Sources */,
 				3317A9A469C6DD815CFEB4F2 /* FaceSDKSwiftManager.swift in Sources */,
@@ -348,7 +345,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = G35M5X479Y;
+				DEVELOPMENT_TEAM = ASM2N4Z832;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = FaceRN/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
@@ -386,7 +383,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = G35M5X479Y;
+				DEVELOPMENT_TEAM = ASM2N4Z832;
 				INFOPLIST_FILE = FaceRN/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.5;
 				LD_RUNPATH_SEARCH_PATHS = (
