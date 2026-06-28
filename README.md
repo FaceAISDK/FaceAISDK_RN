@@ -26,7 +26,7 @@ npm install @faceaisdk/react-native-face-sdk
      faceaisdk_post_install(installer)
    end
    ```
-2. Navigate to the `ios` directory and install pods:
+2. cd ios and run pod install (TensorFlowLiteSwift may take a while depending on the network)
    ```bash
    cd ios && pod install
    ```
@@ -108,7 +108,7 @@ npm install @faceaisdk/react-native-face-sdk
      faceaisdk_post_install(installer)
    end
    ```
-2. 进入 `ios` 目录并安装 Pod 依赖：
+2. 进入 `ios` 目录并安装 Pod 依赖(TensorFlowLiteSwift根据网络状态会需要比较长时间)
    ```bash
    cd ios && pod install
    ```
