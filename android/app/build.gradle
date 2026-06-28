@@ -76,6 +76,7 @@ android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
+    ndkVersion '29.0.14206865'
 
     namespace "com.faceaisdk_rn"
     defaultConfig {
@@ -84,16 +85,6 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
-
-        // 支持 16KB 页面对齐 (Android 15+ 推荐)
-        externalNativeBuild {
-            cmake {
-                cppFlags "-Wl,-z,max-page-size=16384"
-            }
-            ndkBuild {
-                arguments "APP_LDFLAGS+=-Wl,-z,max-page-size=16384"
-            }
-        }
     }
     signingConfigs {
         debug {
