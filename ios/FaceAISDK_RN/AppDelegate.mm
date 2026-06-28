@@ -22,7 +22,6 @@
 - (NSURL *)bundleURL
 {
 #if DEBUG
-  [RCTBundleURLProvider sharedSettings].port = 8765;
   return [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index"];
 #else
   return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];

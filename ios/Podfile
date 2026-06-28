@@ -41,6 +41,40 @@ target 'FaceAISDK_RN' do
 
     # 2. 调用 FaceAISDK 的后置处理
     faceaisdk_post_install(installer)
+
+    # 3. 解决编译报错与真机兼容性问题
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        # 1. 解决 non-modular-include 报错
+        config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
+
+        # 2. 禁止将警告视为错误
+        config.build_settings['GCC_TREAT_WARNINGS_AS_ERRORS'] = 'NO'
+        config.build_settings['WARNING_CFLAGS'] ||= []
+        config.build_settings['WARNING_CFLAGS'] << '-Wno-error'
+
+        # 3. 针对真机编译的必要设置
+        config.build_settings['ENABLE_BITCODE'] = 'NO'
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.5'
+
+        # 4. 解决架构冲突 (针对模拟器与真机切换)
+        config.build_settings.delete 'EXCLUDED_ARCHS[sdk=iphonesimulator*]'
+
+
+        #  暴力清洗：正则剔除 React Native 硬编码的各种 -Werror 标记
+              ['WARNING_CFLAGS', 'OTHER_CFLAGS', 'OTHER_CPLUSPLUSFLAGS'].each do |setting_key|
+                flags = config.build_settings[setting_key]
+                if flags.is_a?(Array)
+                  # 如果是数组，直接剔除所有以 -Werror 开头的元素
+                  flags.reject! { |flag| flag.to_s.start_with?('-Werror') }
+                elsif flags.is_a?(String)
+                  # 如果是字符串，用正则替换掉所有 -Werror 及其衍生子项
+                  config.build_settings[setting_key] = flags.gsub(/-Werror[^\s]*/, '')
+                end
+                end
+
+      end
+    end
   end
 
 
