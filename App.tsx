@@ -84,15 +84,43 @@ const translations = {
 
 // 获取系统语言
 const getSystemLanguage = () => {
-  let locale: string | undefined;
-  if (Platform.OS === 'ios') {
-    locale =
-      NativeModules.SettingsManager.settings.AppleLanguages[0] ||
-      NativeModules.SettingsManager.settings.AppleLocale;
-  } else {
-    locale = NativeModules.I18nManager.localeIdentifier;
+  try {
+    let locale: string | undefined;
+
+    // 1. 首选方案：使用 Intl 对象（在 Hermes 引擎下非常准确且是跨平台的）
+    if (typeof Intl !== 'undefined' && typeof Intl.DateTimeFormat === 'function') {
+      locale = Intl.DateTimeFormat().resolvedOptions().locale;
+    }
+
+    // 2. 备选方案：如果 Intl 不可用，回退到原生模块获取
+    if (!locale) {
+      if (Platform.OS === 'ios') {
+        const settings = NativeModules.SettingsManager?.settings;
+        // iOS 可能返回的是 zh-Hans-CN 或 zh_CN
+        locale = settings?.AppleLanguages?.[0] || settings?.AppleLocale;
+      } else {
+        const i18n = NativeModules.I18nManager;
+        locale = i18n?.localeIdentifier || i18n?.getConstants?.()?.localeIdentifier;
+      }
+    }
+
+    console.log(`Detected locale (Final): ${locale}`);
+
+    if (!locale) {
+      return 'en';
+    }
+
+    const lowerLocale = locale.toLowerCase();
+    // 适配 zh, zh-Hans, zh-Hant, zh_CN, chinese 等
+    if (lowerLocale.startsWith('zh') || lowerLocale.includes('chinese')) {
+      return 'zh';
+    }
+
+    return 'en';
+  } catch (error) {
+    console.warn('Language detection failed, fallback to English:', error);
+    return 'en';
   }
-  return locale?.startsWith('zh') ? 'zh' : 'en';
 };
 
 const lang = getSystemLanguage();
