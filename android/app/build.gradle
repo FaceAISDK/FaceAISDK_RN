@@ -84,6 +84,16 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
+
+        // 支持 16KB 页面对齐 (Android 15+ 推荐)
+        externalNativeBuild {
+            cmake {
+                cppFlags "-Wl,-z,max-page-size=16384"
+            }
+            ndkBuild {
+                arguments "APP_LDFLAGS+=-Wl,-z,max-page-size=16384"
+            }
+        }
     }
     signingConfigs {
         debug {
@@ -96,8 +106,8 @@ android {
 
     packaging {
         jniLibs {
-            // 关键：强制 JNI 库使用 16KB 对齐
-            useLegacyPackaging = true
+            // 关键：关闭 legacyPackaging 并在 Android 15+ 上支持 16KB 页面对齐
+            useLegacyPackaging = false
         }
     }
 
