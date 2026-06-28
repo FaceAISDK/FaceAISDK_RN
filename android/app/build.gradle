@@ -76,7 +76,6 @@ android {
     ndkVersion rootProject.ext.ndkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
-    ndkVersion '29.0.14206865'
 
     namespace "com.faceaisdk_rn"
     defaultConfig {

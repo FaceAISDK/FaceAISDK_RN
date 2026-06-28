@@ -8,7 +8,7 @@ require Pod::Executable.execute_command('node', ['-p',
 #FaceAISDK faceaisdk_post_install.rb
 require_relative '../node_modules/@faceaisdk/react-native-face-sdk/scripts/faceaisdk_post_install.rb'
 
-platform :ios, '15.5'
+platform :ios, '16.0'
 prepare_react_native_project!
 
 linkage = ENV['USE_FRAMEWORKS']
@@ -55,7 +55,7 @@ target 'FaceAISDK_RN' do
 
         # 3. 针对真机编译的必要设置
         config.build_settings['ENABLE_BITCODE'] = 'NO'
-        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.5'
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '16.0'
 
 #         # 4. 解决架构冲突 (针对模拟器与真机切换)
 #         config.build_settings.delete 'EXCLUDED_ARCHS[sdk=iphonesimulator*]'
