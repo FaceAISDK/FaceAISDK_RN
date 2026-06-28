@@ -14,7 +14,8 @@ import {
 } from 'react-native';
 
 import {
-  FACE_AI_STATUS_CODE_MAP,
+  FACE_AI_STATUS_CODE_MAP_CN,
+  FACE_AI_STATUS_CODE_MAP_EN,
   addFaceByImage,
   addFaceBySDKCamera,
   deleteFaceFeature,
@@ -125,6 +126,8 @@ const getSystemLanguage = () => {
 
 const lang = getSystemLanguage();
 const t = (key: keyof typeof translations.en) => translations[lang][key] || translations.en[key];
+
+const STATUS_MAP = lang === 'zh' ? FACE_AI_STATUS_CODE_MAP_CN : FACE_AI_STATUS_CODE_MAP_EN;
 // ----------------
 
 function App() {
@@ -132,7 +135,7 @@ function App() {
   const demoFeature = '0'.repeat(1024);
 
   const showResult = (title: string, result: FaceResult) => {
-    const codeDesc = FACE_AI_STATUS_CODE_MAP[result.code] || t('undefined_status');
+    const codeDesc = STATUS_MAP[result.code] || t('undefined_status');
 
     Alert.alert(
       title,
