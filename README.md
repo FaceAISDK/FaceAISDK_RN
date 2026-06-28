@@ -17,16 +17,7 @@ npm install @faceaisdk/react-native-face-sdk
 ```
 
 #### iOS Configuration
-1. Navigate to the `ios` directory and install pods:
-   ```bash
-   cd ios && pod install
-   ```
-2. Add the camera permission to your `Info.plist`:
-   ```xml
-   <key>NSCameraUsageDescription</key>
-   <string>We need access to your camera for face recognition and liveness detection.</string>
-   ```
-3. Update your `ios/Podfile` to include the SDK post-install hook:
+1. Update your `ios/Podfile` to include the SDK post-install hook:
    ```ruby
    require_relative '../node_modules/@faceaisdk/react-native-face-sdk/scripts/faceaisdk_post_install.rb'
 
@@ -34,6 +25,15 @@ npm install @faceaisdk/react-native-face-sdk
      react_native_post_install(installer, config[:reactNativePath], :mac_catalyst_enabled => false)
      faceaisdk_post_install(installer)
    end
+   ```
+2. Navigate to the `ios` directory and install pods:
+   ```bash
+   cd ios && pod install
+   ```
+3. Add the camera permission to your `Info.plist`:
+   ```xml
+   <key>NSCameraUsageDescription</key>
+   <string>We need access to your camera for face recognition and liveness detection.</string>
    ```
 
 #### Android Configuration
@@ -99,16 +99,7 @@ npm install @faceaisdk/react-native-face-sdk
 ```
 
 #### iOS 配置
-1. 进入 `ios` 目录并安装 Pod 依赖：
-   ```bash
-   cd ios && pod install
-   ```
-2. 在 `Info.plist` 中添加相机权限描述：
-   ```xml
-   <key>NSCameraUsageDescription</key>
-   <string>我们需要访问您的相机进行人脸识别与活体检测</string>
-   ```
-3. 在您的 `ios/Podfile` 中接入必要的脚本：
+1. 在您的 `ios/Podfile` 中接入必要的脚本：
    ```ruby
    require_relative '../node_modules/@faceaisdk/react-native-face-sdk/scripts/faceaisdk_post_install.rb'
 
@@ -116,6 +107,15 @@ npm install @faceaisdk/react-native-face-sdk
      react_native_post_install(installer, config[:reactNativePath], :mac_catalyst_enabled => false)
      faceaisdk_post_install(installer)
    end
+   ```
+2. 进入 `ios` 目录并安装 Pod 依赖：
+   ```bash
+   cd ios && pod install
+   ```
+3. 在 `Info.plist` 中添加相机权限描述：
+   ```xml
+   <key>NSCameraUsageDescription</key>
+   <string>我们需要访问您的相机进行人脸识别与活体检测</string>
    ```
 
 #### Android 配置
