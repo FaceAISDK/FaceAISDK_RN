@@ -7,9 +7,9 @@
 ## English
 
 ### 1. Start Metro Bundler
-Always start the Metro server first in a separate terminal window. This project uses a custom port **8765**.
+Always start the Metro server first in a separate terminal window. Using `npm start` ensures the correct local version is used.
 ```bash
-npx react-native start --port 8765 --reset-cache
+npm start -- --reset-cache
 ```
 
 ### 2. Run on Android Device
@@ -22,7 +22,7 @@ npx react-native start --port 8765 --reset-cache
    ```
 3. **Launch App**:
    ```bash
-   npx react-native run-android --port 8765
+   npm run android
    ```
 
 ### 3. Run on iOS Device
@@ -37,7 +37,7 @@ npx react-native start --port 8765 --reset-cache
    - Go to **Signing & Capabilities** and select your Development Team.
 3. **Launch App**:
    ```bash
-   npx react-native run-ios --device --port 8765
+   npm run ios
    ```
 
 ### 4. Deep Clean (Troubleshooting)
@@ -52,7 +52,7 @@ rm -rf ~/Library/Developer/Xcode/DerivedData/FaceAISDK_RN-*
 
 # Restart everything
 killall -9 node
-npx react-native start --port 8765 --reset-cache
+npm start -- --reset-cache
 ```
 
 ---
@@ -60,9 +60,9 @@ npx react-native start --port 8765 --reset-cache
 ## 中文
 
 ### 1. 启动 Metro 服务
-请务必在独立的终端窗口中先启动 Metro 服务。本项目使用自定义端口 **8765**。
+请务必在独立的终端窗口中先启动 Metro 服务。使用 `npm start` 可以确保使用项目中安装的正确版本。
 ```bash
-npx react-native start --port 8765 --reset-cache
+npm start -- --reset-cache
 ```
 
 ### 2. 运行到 Android 真机
@@ -75,7 +75,7 @@ npx react-native start --port 8765 --reset-cache
    ```
 3. **启动项目**：
    ```bash
-   npx react-native run-android --port 8765
+   npm run android
    ```
 
 ### 3. 运行到 iOS 真机
@@ -90,7 +90,7 @@ npx react-native start --port 8765 --reset-cache
    - 在 **Signing & Capabilities** 选项卡中配置您的开发团队（Team）。
 3. **启动项目**：
    ```bash
-   npx react-native run-ios --device --port 8765
+   npm run ios
    ```
 
 ### 4. 深度清理（故障排除）
@@ -105,5 +105,5 @@ rm -rf ~/Library/Developer/Xcode/DerivedData/FaceAISDK_RN-*
 
 # 重置所有环境
 killall -9 node
-npx react-native start --port 8765 --reset-cache
+npm start -- --reset-cache
 ```
