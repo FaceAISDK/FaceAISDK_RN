@@ -40,8 +40,6 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Face recognition requires camera access</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
 	<key>RCTNewArchEnabled</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

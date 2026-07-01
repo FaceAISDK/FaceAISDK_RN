@@ -12,7 +12,7 @@ echo "========================================"
 # 1. 检查依赖
 if [ ! -d "node_modules/@faceaisdk/react-native-face-sdk" ]; then
     echo "📦 正在安装 SDK..."
-    npm install @faceaisdk/react-native-face-sdk react-native-safe-area-context --save
+    npm install @faceaisdk/react-native-face-sdk --save
 fi
 
 # 2. 检查 Autolinking
