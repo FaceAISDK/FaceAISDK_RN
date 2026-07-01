@@ -8,8 +8,8 @@
 FaceAISDK_RN/
 ├── src/                             # TypeScript 对外 API 源码
 ├── lib/                             # 编译后的 JS/d.ts 产物 (发布核心)
-├── android/                         # 原生 Android Library 工程
-├── ios/                             # 原生 iOS 工程与资源
+├── android/                         # 原生 Android SDK Library 源码与资源
+├── ios/                             # 原生 iOS SDK 源码与资源
 ├── __tests__/                       # 单元测试
 ├── example/                         # 联调验证示例 App (不发布)
 └── @faceaisdk/react-native-face-sdk.podspec
@@ -20,6 +20,8 @@ FaceAISDK_RN/
 示例工程已经通过 `metro.config.js` 的 `extraNodeModules` 将包名直接解析到仓库根目录，实现免安装直接实时调试源码。
 
 同时，`example/package.json` 中的 `"@faceaisdk/react-native-face-sdk": "file:.."` 会在 `example/node_modules` 下创建指向仓库根目录的本地链接。这是给 React Native CLI、CocoaPods autolinking 和原生构建流程识别本地插件用的。
+
+`example/ios` 和 `example/android` 只保留宿主 App 工程文件；SDK 原生实现统一维护在根目录 `ios/`、`android/` 中，并通过本地包 autolinking 接入 Example。
 
 > 注意：安装日志中出现 npm registry 访问，通常只是下载 `react-native`、Babel、Jest 等第三方依赖；并不代表 Example 切到了远程发布版 SDK。`example/ensure-js-deps.sh` 会打印当前实际使用的 SDK 路径。
 

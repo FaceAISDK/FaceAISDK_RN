@@ -1,5 +1,5 @@
 //
-//  FaceRNModule.m
+//  FaceRNModule.mm
 //  FaceRN
 //
 //  This file is a duplicate. See FaceRN/FaceRNModule.m for the actual implementation.
@@ -8,7 +8,7 @@
 #import "FaceRNModule.h"
 #import <UIKit/UIKit.h>
 
-#import "FaceRN-Swift.h"
+#import "FaceAISDKReactNative-Swift.h"
 
 @implementation FaceRNModule
 
