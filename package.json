@@ -1,6 +1,6 @@
 {
   "name": "FaceAISDK_RN",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "private": true,
   "files": [
     "scripts",
@@ -17,7 +17,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@faceaisdk/react-native-face-sdk": "^0.3.1",
+    "@faceaisdk/react-native-face-sdk": "^0.3.2",
     "react": "19.2.3",
     "react-native": "0.84.0",
     "react-native-safe-area-context": "^5.8.0"
