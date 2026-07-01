@@ -1449,7 +1449,7 @@ PODS:
     - React-RCTFBReactNativeSpec
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
-  - react-native-face-sdk (0.3.0):
+  - react-native-face-sdk (0.3.1):
     - FaceAISDK_Core (= 2026.06.25)
     - React-Core
     - TensorFlowLiteSwift (= 2.17.0)
@@ -2217,7 +2217,7 @@ SPEC CHECKSUMS:
   React-logger: 9e51e01455f15cb3ef87a09a1ec773cdb22d56c1
   React-Mapbuffer: 92b99e450e8ff598b27d6e4db3a75e04fd45e9a9
   React-microtasksnativemodule: 2fe0f2bd2840dedbd66c0ac249c64f977f39cc18
-  react-native-face-sdk: 5682481bd4586713a8bc36c28ab1e094c8d5e2d7
+  react-native-face-sdk: a0706311d60a369a8ec45706e346962c3a966a60
   react-native-safe-area-context: 5727bd761ca52fa393b40989a6483bf859622136
   React-NativeModulesApple: 44a9474594566cd03659f92e38f42599c6b9dee4
   React-networking: db73d91466cb134fcbdaaa579fb2de14e2c2ea01
