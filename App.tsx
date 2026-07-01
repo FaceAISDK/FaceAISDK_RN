@@ -1,17 +1,16 @@
 import React from 'react';
 import {
-  StatusBar,
-  StyleSheet,
-  View,
-  TouchableOpacity,
-  Text,
   Alert,
+  PermissionsAndroid,
   Platform,
   ScrollView,
-  SafeAreaView,
-  PermissionsAndroid,
-  NativeModules,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
+import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {
   FACE_AI_STATUS_CODE_MAP_CN,
@@ -27,157 +26,254 @@ import {
   type FaceResult,
 } from '@faceaisdk/react-native-face-sdk';
 
-// --- 国际化处理 ---
-const translations = {
+const DEMO_FACE_ID = 'testUser001';
+const DEMO_FEATURE = '0'.repeat(1024);
+const DEMO_BASE64_IMAGE = 'demo_base64_image_string';
+
+const labels = {
   en: {
     title: 'RN FaceSDK API Demo',
     connected: 'Plugin Connected',
     disconnected: 'Plugin Disconnected',
-    permission_error: 'Permission Error',
-    camera_denied: 'Camera permission is required for face recognition.',
-    enroll_title: 'Enrollment Result',
-    enroll_btn: 'Enroll Face via SDK Camera',
-    verify_title: 'Verification Result',
-    verify_btn: 'Face Verify + Liveness',
-    liveness_title: 'Liveness Result',
-    liveness_btn: 'Liveness Detection',
-    query_title: 'Query Feature',
-    query_btn: 'Query Face Feature Info',
-    sync_title: 'Sync Feature',
-    sync_btn: 'Sync Face Feature Info',
-    image_enroll_title: 'Image Enrollment Result',
-    image_enroll_btn: 'Enroll Face via Image',
-    delete_title: 'Delete Feature',
-    delete_btn: 'Delete Face Feature Info',
-    failed: 'Failed',
-    unknown_error: 'Unknown Error',
-    undefined_status: 'Undefined Status',
-    feature_len: 'faceFeature Length: ',
-    base64_len: 'faceBase64 Length: ',
+    permissionError: 'Permission Error',
+    cameraDenied: 'Camera permission is required for face recognition.',
+    failed: ' Failed',
+    unknownError: 'Unknown Error',
+    undefinedStatus: 'Undefined Status',
+    featureLength: 'faceFeature Length',
+    base64Length: 'faceBase64 Length',
+    enroll: 'Enroll Face via SDK Camera',
+    verify: 'Face Verify + Liveness',
+    liveness: 'Liveness Detection',
+    query: 'Query Face Feature Info',
+    sync: 'Sync Face Feature Info',
+    imageEnroll: 'Enroll Face via Image',
+    remove: 'Delete Face Feature Info',
   },
   zh: {
     title: 'RN FaceSDK API Demo',
     connected: '插件已连接',
     disconnected: '插件未连接',
-    permission_error: '权限错误',
-    camera_denied: '需要相机权限才能使用人脸识别功能',
-    enroll_title: '录入人脸结果',
-    enroll_btn: 'SDK相机录入人脸信息',
-    verify_title: '人脸识别结果',
-    verify_btn: '人脸识别+活体检测',
-    liveness_title: '活体检测结果',
-    liveness_btn: '检测人脸是否活体',
-    query_title: '查询人脸特征',
-    query_btn: '查询人脸特征信息',
-    sync_title: '同步人脸特征',
-    sync_btn: '同步人脸特征信息',
-    image_enroll_title: '图片录入结果',
-    image_enroll_btn: '图片录入人脸信息',
-    delete_title: '删除人脸特征',
-    delete_btn: '删除人脸特征信息',
+    permissionError: '权限错误',
+    cameraDenied: '需要相机权限才能使用人脸识别功能',
     failed: '失败',
-    unknown_error: '未知错误',
-    undefined_status: '未定义状态',
-    feature_len: 'faceFeature长度: ',
-    base64_len: 'faceBase64长度: ',
+    unknownError: '未知错误',
+    undefinedStatus: '未定义状态',
+    featureLength: 'faceFeature 长度',
+    base64Length: 'faceBase64 长度',
+    enroll: 'SDK 相机录入人脸',
+    verify: '人脸识别 + 活体检测',
+    liveness: '活体检测',
+    query: '查询人脸特征',
+    sync: '同步人脸特征',
+    imageEnroll: '图片录入人脸',
+    remove: '删除人脸特征',
   },
-};
+} as const;
 
-// 获取系统语言
-const getSystemLanguage = () => {
-  try {
-    let locale: string | undefined;
+type Language = keyof typeof labels;
+type LabelKey = keyof (typeof labels)['en'];
+type RawResult = Record<string, unknown>;
 
-    // 1. 首选方案：使用 Intl 对象（在 Hermes 引擎下非常准确且是跨平台的）
-    if (typeof Intl !== 'undefined' && typeof Intl.DateTimeFormat === 'function') {
-      locale = Intl.DateTimeFormat().resolvedOptions().locale;
-    }
-
-    // 2. 备选方案：如果 Intl 不可用，回退到原生模块获取
-    if (!locale) {
-      if (Platform.OS === 'ios') {
-        const settings = NativeModules.SettingsManager?.settings;
-        // iOS 可能返回的是 zh-Hans-CN 或 zh_CN
-        locale = settings?.AppleLanguages?.[0] || settings?.AppleLocale;
-      } else {
-        const i18n = NativeModules.I18nManager;
-        locale = i18n?.localeIdentifier || i18n?.getConstants?.()?.localeIdentifier;
-      }
-    }
-
-    console.log(`Detected locale (Final): ${locale}`);
-
-    if (!locale) {
-      return 'en';
-    }
-
-    const lowerLocale = locale.toLowerCase();
-    // 适配 zh, zh-Hans, zh-Hant, zh_CN, chinese 等
-    if (lowerLocale.startsWith('zh') || lowerLocale.includes('chinese')) {
-      return 'zh';
-    }
-
-    return 'en';
-  } catch (error) {
-    console.warn('Language detection failed, fallback to English:', error);
+function getLanguage(): Language {
+  if (typeof Intl === 'undefined') {
     return 'en';
   }
-};
 
-const lang = getSystemLanguage();
-const t = (key: keyof typeof translations.en) => translations[lang][key] || translations.en[key];
+  return Intl.DateTimeFormat().resolvedOptions().locale.toLowerCase().startsWith('zh')
+    ? 'zh'
+    : 'en';
+}
 
-const STATUS_MAP = lang === 'zh' ? FACE_AI_STATUS_CODE_MAP_CN : FACE_AI_STATUS_CODE_MAP_EN;
-// ----------------
+const language = getLanguage();
 
-function App() {
-  const demoFaceID = 'testUser001';
-  const demoFeature = '0'.repeat(1024);
+const t = (key: LabelKey) => labels[language][key];
+const statusMap =
+  language === 'zh' ? FACE_AI_STATUS_CODE_MAP_CN : FACE_AI_STATUS_CODE_MAP_EN;
 
-  const showResult = (title: string, result: FaceResult) => {
-    const codeDesc = STATUS_MAP[result.code] || t('undefined_status');
+function toRawResult(value: unknown): RawResult {
+  if (Array.isArray(value)) {
+    return toRawResult(value[0]);
+  }
 
-    Alert.alert(
-      title,
-      [
-        `code: ${result.code}`,
-        `codeDesc: ${codeDesc}`,
-        `msg: ${result.msg}`,
-        `faceID: ${result.faceID}`,
-        `similarity: ${result.similarity}`,
-        `liveness: ${result.liveness}`,
-        `${t('feature_len')}${result.faceFeature?.length || 0}`,
-        `${t('base64_len')}${result.faceBase64?.length || 0}`,
-      ].join('\n'),
-    );
-  };
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
 
-  const runAction = async (
-    title: string,
-    action: () => Promise<FaceResult>,
-  ) => {
-    if (Platform.OS === 'android') {
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.CAMERA,
-      );
-      if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
-        Alert.alert(t('permission_error'), t('camera_denied'));
-        return;
-      }
+    if (!trimmed) {
+      return {};
     }
 
     try {
-      const result = await action();
-      showResult(title, result);
+      return toRawResult(JSON.parse(trimmed));
+    } catch {
+      return {msg: trimmed};
+    }
+  }
+
+  if (!value || typeof value !== 'object') {
+    return {};
+  }
+
+  const result = value as RawResult;
+  const nested = result.result ?? result.data ?? result.payload;
+
+  if (nested && nested !== value) {
+    return toRawResult(nested);
+  }
+
+  return result;
+}
+
+function readNumber(result: RawResult, keys: string[], fallback = 0) {
+  for (const key of keys) {
+    const value = result[key];
+
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return value;
+    }
+
+    if (typeof value === 'string') {
+      const numberValue = Number(value);
+
+      if (Number.isFinite(numberValue)) {
+        return numberValue;
+      }
+    }
+  }
+
+  return fallback;
+}
+
+function readString(result: RawResult, keys: string[]) {
+  for (const key of keys) {
+    const value = result[key];
+
+    if (typeof value === 'string') {
+      return value;
+    }
+
+    if (typeof value === 'number' || typeof value === 'boolean') {
+      return String(value);
+    }
+  }
+
+  return '';
+}
+
+export function normalizeFaceResult(value: unknown): FaceResult {
+  const result = toRawResult(value);
+
+  return {
+    code: readNumber(result, ['code', 'resultCode', 'statusCode', 'Code']),
+    msg: readString(result, ['msg', 'message', 'error', 'reason', 'Msg']),
+    faceID: readString(result, ['faceID', 'faceId', 'face_id', 'userFaceID']),
+    similarity: readNumber(result, ['similarity', 'score']),
+    liveness: readNumber(result, ['liveness', 'livenessScore']),
+    faceFeature: readString(result, ['faceFeature', 'feature']),
+    faceBase64: readString(result, ['faceBase64', 'base64', 'imageBase64']),
+  };
+}
+
+async function requestCameraPermission() {
+  if (Platform.OS !== 'android') {
+    return true;
+  }
+
+  const granted = await PermissionsAndroid.request(
+    PermissionsAndroid.PERMISSIONS.CAMERA,
+  );
+
+  return granted === PermissionsAndroid.RESULTS.GRANTED;
+}
+
+function showResult(title: string, result: FaceResult) {
+  Alert.alert(
+    title,
+    [
+      `code: ${result.code}`,
+      `codeDesc: ${statusMap[result.code] ?? t('undefinedStatus')}`,
+      `msg: ${result.msg}`,
+      `faceID: ${result.faceID}`,
+      `similarity: ${result.similarity}`,
+      `liveness: ${result.liveness}`,
+      `${t('featureLength')}: ${result.faceFeature?.length ?? 0}`,
+      `${t('base64Length')}: ${result.faceBase64?.length ?? 0}`,
+    ].join('\n'),
+  );
+}
+
+function App() {
+  const runAction = async (
+    title: string,
+    action: () => Promise<unknown>,
+    needsCamera = true,
+  ) => {
+    if (needsCamera && !(await requestCameraPermission())) {
+      Alert.alert(t('permissionError'), t('cameraDenied'));
+      return;
+    }
+
+    try {
+      showResult(title, normalizeFaceResult(await action()));
     } catch (error) {
       Alert.alert(
         `${title}${t('failed')}`,
-        error instanceof Error ? error.message : t('unknown_error'),
+        error instanceof Error ? error.message : t('unknownError'),
       );
     }
   };
 
-  const demoBase64 = 'demo_base64_image_string';
+  const actions = [
+    {
+      label: t('enroll'),
+      run: () =>
+        addFaceBySDKCamera(DEMO_FACE_ID, {mode: 1, showConfirm: true}),
+    },
+    {
+      label: t('verify'),
+      run: () =>
+        faceVerify(DEMO_FACE_ID, {
+          threshold: 0.83,
+          livenessType: 1,
+          motionTypes: '1,2,3,4,5',
+          timeout: 7,
+          steps: 2,
+          allowMultiFaces: true,
+        }),
+    },
+    {
+      label: t('liveness'),
+      run: () =>
+        livenessVerify({
+          livenessType: 1,
+          motionTypes: '1,2,3,4,5',
+          timeout: 7,
+          steps: 2,
+          allowMultiFaces: true,
+          showResultTips: false,
+        }),
+    },
+    {
+      label: t('query'),
+      run: () => getFaceFeature(DEMO_FACE_ID),
+      needsCamera: false,
+    },
+    {
+      label: t('sync'),
+      run: () => insertFaceFeature(DEMO_FACE_ID, DEMO_FEATURE),
+      needsCamera: false,
+    },
+    {
+      label: t('imageEnroll'),
+      run: () => addFaceByImage(DEMO_FACE_ID, DEMO_BASE64_IMAGE),
+      needsCamera: false,
+    },
+    {
+      label: t('remove'),
+      run: () => deleteFaceFeature(DEMO_FACE_ID),
+      needsCamera: false,
+    },
+  ];
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -185,90 +281,23 @@ function App() {
         <StatusBar barStyle="dark-content" />
         <Text style={styles.title}>{t('title')}</Text>
         <Text style={styles.subtitle}>
-          {Platform.OS === 'ios' ? 'iOS' : 'Android'} · {isFaceAIModuleAvailable() ? t('connected') : t('disconnected')}
+          {Platform.OS} ·{' '}
+          {isFaceAIModuleAvailable() ? t('connected') : t('disconnected')}
         </Text>
+
         <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}>
-
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() =>
-              runAction(t('enroll_title'), () =>
-                addFaceBySDKCamera(demoFaceID, {
-                  mode: 1,
-                  showConfirm: true,
-                }),
-              )
-            }>
-            <Text style={styles.buttonText}>{t('enroll_btn')}</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() =>
-              runAction(t('verify_title'), () =>
-                faceVerify(demoFaceID, {
-                  threshold: 0.83,
-                  livenessType: 1,
-                  motionTypes: '1,2,3,4,5',
-                  timeout: 7,
-                  steps: 2,
-                  allowMultiFaces: true,
-                }),
-              )
-            }>
-            <Text style={styles.buttonText}>{t('verify_btn')}</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() =>
-              runAction(t('liveness_title'), () =>
-                livenessVerify({
-                  livenessType: 1,
-                  motionTypes: '1,2,3,4,5',
-                  timeout: 7,
-                  steps: 2,
-                  allowMultiFaces: true,
-                  showResultTips: false,
-                }),
-              )
-            }>
-            <Text style={styles.buttonText}>{t('liveness_btn')}</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => runAction(t('query_title'), () => getFaceFeature(demoFaceID))}>
-            <Text style={styles.buttonText}>{t('query_btn')}</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() =>
-              runAction(t('sync_title'), () =>
-                insertFaceFeature(demoFaceID, demoFeature),
-              )
-            }>
-            <Text style={styles.buttonText}>{t('sync_btn')}</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() =>
-              runAction(t('image_enroll_title'), () => addFaceByImage(demoFaceID, demoBase64))
-            }>
-            <Text style={styles.buttonText}>{t('image_enroll_btn')}</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => runAction(t('delete_title'), () => deleteFaceFeature(demoFaceID))}>
-            <Text style={styles.buttonText}>{t('delete_btn')}</Text>
-          </TouchableOpacity>
-
+          {actions.map(({label, run, needsCamera}) => (
+            <TouchableOpacity
+              key={label}
+              style={styles.button}
+              onPress={() => runAction(label, run, needsCamera)}>
+              <Text style={styles.buttonText}>{label}</Text>
+            </TouchableOpacity>
+          ))}
         </ScrollView>
+
         <Text style={styles.footer}>Email: FaceAISDK.Service@gmail.com</Text>
       </View>
     </SafeAreaView>
@@ -282,10 +311,9 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
-    paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight || 0) + 10 : 10,
+    paddingTop: Platform.OS === 'android' ? (StatusBar.currentHeight ?? 0) + 10 : 10,
     paddingBottom: 20,
   },
   title: {
@@ -308,13 +336,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   button: {
-    backgroundColor: '#34C759',
-    paddingHorizontal: 24,
-    paddingVertical: 14,
-    borderRadius: 8,
-    marginVertical: 6,
     width: '100%',
     alignItems: 'center',
+    backgroundColor: '#34C759',
+    borderRadius: 8,
+    marginVertical: 6,
+    paddingHorizontal: 24,
+    paddingVertical: 14,
   },
   buttonText: {
     color: '#FFFFFF',
