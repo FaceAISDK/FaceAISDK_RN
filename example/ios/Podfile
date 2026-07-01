@@ -15,7 +15,7 @@ if linkage != nil
 end
 
 target 'FaceRN' do
-  pod 'FaceAISDK_Core', :git => 'https://github.com/FaceAISDK/FaceAISDK_Core.git', :tag => '2026.06.25'
+  pod 'FaceAISDK_Core', :git => 'https://github.com/FaceAISDK/FaceAISDK_Core.git', :tag => '2026.06.29'
   config = use_native_modules!
 
   use_react_native!(
