@@ -13,8 +13,7 @@ import {
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import {
-  FACE_AI_STATUS_CODE_MAP_CN,
-  FACE_AI_STATUS_CODE_MAP_EN,
+  FACE_AI_STATUS_CODE_MAP,
   addFaceByImage,
   addFaceBySDKCamera,
   deleteFaceFeature,
@@ -88,8 +87,25 @@ function getLanguage(): Language {
 const language = getLanguage();
 
 const t = (key: LabelKey) => labels[language][key];
+const FACE_AI_STATUS_CODE_MAP_EN: Record<number, string> = {
+  [-1]: 'Camera permission denied',
+  0: 'Initial state/user canceled',
+  1: 'Face recognition or enrollment succeeded',
+  2: 'Face verification failed: similarity below threshold',
+  3: 'Motion liveness passed',
+  4: 'Motion liveness timeout',
+  5: 'No face detected repeatedly',
+  6: 'No local face feature found',
+  7: 'Color liveness passed',
+  8: 'Color liveness failed',
+  9: 'Color liveness failed: ambient light too strong',
+  10: 'Liveness process completed',
+  11: 'Silent liveness failed',
+  12: 'No enrolled face information',
+  13: 'Multiple faces detected',
+};
 const statusMap =
-  language === 'zh' ? FACE_AI_STATUS_CODE_MAP_CN : FACE_AI_STATUS_CODE_MAP_EN;
+  language === 'zh' ? FACE_AI_STATUS_CODE_MAP : FACE_AI_STATUS_CODE_MAP_EN;
 
 function toRawResult(value: unknown): RawResult {
   if (Array.isArray(value)) {
