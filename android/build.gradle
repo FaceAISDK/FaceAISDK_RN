@@ -3,11 +3,11 @@ apply plugin: 'org.jetbrains.kotlin.android'
 
 android {
     namespace 'com.faceaisdk.reactnative'
-    compileSdkVersion rootProject.ext.has('compileSdkVersion') ? rootProject.ext.compileSdkVersion : 36
+    compileSdkVersion rootProject.ext.has('compileSdkVersion') ? rootProject.ext.compileSdkVersion : 33
 
     defaultConfig {
         minSdkVersion rootProject.ext.has('minSdkVersion') ? rootProject.ext.minSdkVersion : 24
-        targetSdkVersion rootProject.ext.has('targetSdkVersion') ? rootProject.ext.targetSdkVersion : 36
+        targetSdkVersion rootProject.ext.has('targetSdkVersion') ? rootProject.ext.targetSdkVersion : 33
         consumerProguardFiles 'proguard-rules.pro'
     }
 

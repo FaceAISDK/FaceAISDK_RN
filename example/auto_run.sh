@@ -202,10 +202,21 @@ build_and_launch_ios() {
         return 1
     fi
 
+    local ios_deploy="$REPO_DIR/node_modules/.bin/ios-deploy"
+    if [ ! -x "$ios_deploy" ]; then
+        echo "⚠️  未在 node_modules 中找到可执行的 ios-deploy，尝试直接使用系统路径..."
+        if command -v ios-deploy > /dev/null 2>&1; then
+            ios_deploy="ios-deploy"
+        else
+            echo "❌ 未找到 ios-deploy 工具，请运行 'npm install' 或 'brew install ios-deploy'。"
+            return 1
+        fi
+    fi
+
     echo "🚀 正在使用 ios-deploy 安装并启动到 $ios_name ..."
     # 移除 --no-wifi 以避免连接限制
     # 增加 --app_deltas 提高增量安装稳定性
-    if ! "$REPO_DIR/node_modules/.bin/ios-deploy" \
+    if ! "$ios_deploy" \
         --id "$ios_udid" \
         --bundle "$app_path" \
         --justlaunch \

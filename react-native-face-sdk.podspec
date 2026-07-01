@@ -11,7 +11,8 @@ Pod::Spec.new do |s|
   s.authors      = { 'FaceAISDK' => 'support@faceaisdk.example' }
   s.platforms    = { :ios => '15.5' }
   s.source       = { :git => 'https://github.com/FaceAISDK/FaceAISDK_RN.git', :tag => s.version.to_s }
-  s.source_files = 'ios/**/*.{h,m,swift}'
+  s.source_files = 'ios/**/*.{h,m,mm,swift}'
+  s.exclude_files = 'ios/Pods/**/*'
   s.resources    = [
     'ios/Resources/**/*',
   ]
@@ -30,9 +31,9 @@ Pod::Spec.new do |s|
   }
 
   s.dependency 'React-Core'
-  s.dependency 'FaceAISDK_Core', '2026.06.25'
+  s.dependency 'FaceAISDK_Core', '2026.06.29'
 
   # FaceAISDK_Core 已传递依赖 TensorFlowLiteSwift 2.17.0，此处显式声明仅为锁定版本一致。
-  s.dependency 'TensorFlowLiteSwift', '2.17.0'
+  # s.dependency 'TensorFlowLiteSwift', '2.17.0'
 end
 

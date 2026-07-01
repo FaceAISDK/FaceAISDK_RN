@@ -5,7 +5,10 @@ require Pod::Executable.execute_command('node', ['-p',
     {paths: [process.argv[1]]},
   )', __dir__]).strip
 
-platform :ios, 15.5
+# SDK特殊处理 FaceAISDK faceaisdk_post_install.rb
+require_relative '../../scripts/faceaisdk_post_install.rb'
+
+platform :ios, '15.5'
 prepare_react_native_project!
 
 linkage = ENV['USE_FRAMEWORKS']
@@ -15,7 +18,9 @@ if linkage != nil
 end
 
 target 'FaceRN' do
+  # 强制指定 FaceAISDK_Core 的 git 源和 tag，确保与插件 podspec 声明的版本一致
   pod 'FaceAISDK_Core', :git => 'https://github.com/FaceAISDK/FaceAISDK_Core.git', :tag => '2026.06.29'
+
   config = use_native_modules!
 
   use_react_native!(
@@ -25,12 +30,17 @@ target 'FaceRN' do
   )
 
   post_install do |installer|
+    # 1. 执行 React Native 标准的后置处理
     react_native_post_install(
       installer,
       config[:reactNativePath],
-      :mac_catalyst_enabled => false,
-      # :ccache_enabled => true
+      :mac_catalyst_enabled => false
     )
+
+    # 2. 调用 FaceAISDK 的后置处理（解决 TensorFlowLite 模块化等问题）
+    faceaisdk_post_install(installer)
+
+    # 3. 统一所有 Target 的部署版本
     installer.pods_project.build_configurations.each do |config|
       config.build_settings["CLANG_ENABLE_MODULES"] = "YES"
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.5'
@@ -40,58 +50,6 @@ target 'FaceRN' do
       target.build_configurations.each do |config|
         config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.5'
       end
-
-      if ['RCTSwiftUI', 'RCTSwiftUIWrapper', 'TensorFlowLiteSwift'].include?(target.name)
-        target.build_configurations.each do |bc|
-          existing = bc.build_settings['OTHER_SWIFT_FLAGS'] || '$(inherited)'
-          unless existing.include?('-no-verify-emitted-module-interface')
-            bc.build_settings['OTHER_SWIFT_FLAGS'] = existing + ' -no-verify-emitted-module-interface'
-          end
-        end
-      end
-
-      if target.name == 'TensorFlowLiteSwift'
-        target.build_configurations.each do |bc|
-          bc.build_settings['BUILD_LIBRARY_FOR_DISTRIBUTION'] = 'YES'
-        end
-      end
-
-      # Pod targets that consume FaceAISDK_Core (e.g. react-native-face-sdk) must
-      # recompile its .swiftinterface because the prebuilt xcframework was built
-      # with an older Swift toolchain. That recompilation needs to discover the
-      # TensorFlowLite Clang modulemap, so expose Pods/Headers/Public via the
-      # Swift include paths (Xcc module-map flags are not propagated here).
-      header_path = "#{installer.sandbox.root}/Headers/Public"
-      target.build_configurations.each do |bc|
-        existing = bc.build_settings['SWIFT_INCLUDE_PATHS'] || '$(inherited)'
-        unless existing.to_s.include?(header_path)
-          bc.build_settings['SWIFT_INCLUDE_PATHS'] = "#{existing} \"#{header_path}\""
-        end
-      end
-    end
-
-    # Create module.modulemap for TensorFlowLite so it can be discovered during
-    # FaceAISDK_Core swiftinterface processing (Xcc flags are not propagated, but
-    # Swift -I paths are used for Clang module discovery in that context)
-    tfl_dir = "#{installer.sandbox.root}/Headers/Public/TensorFlowLite"
-    modulemap_link = File.join(tfl_dir, "module.modulemap")
-    unless File.exist?(modulemap_link)
-      File.symlink("TensorFlowLiteSwift.modulemap", modulemap_link)
-    end
-
-    # Add Pods/Headers/Public to SWIFT_INCLUDE_PATHS so TensorFlowLite/module.modulemap
-    # is discoverable during swiftinterface processing
-    pods_headers_public = "#{installer.sandbox.root}/Headers/Public"
-    installer.aggregate_targets.each do |aggregate_target|
-      aggregate_target.xcconfigs.each do |config_name, xcconfig|
-        existing = xcconfig.attributes['SWIFT_INCLUDE_PATHS'] || '$(inherited)'
-        unless existing.include?(pods_headers_public)
-          xcconfig.attributes['SWIFT_INCLUDE_PATHS'] = "#{existing} \"#{pods_headers_public}\""
-          xcconfig_path = aggregate_target.xcconfig_path(config_name)
-          xcconfig.save_as(xcconfig_path)
-        end
-      end
     end
   end
 end
-
