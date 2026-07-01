@@ -2224,7 +2224,7 @@ SPEC CHECKSUMS:
   React-logger: 9e51e01455f15cb3ef87a09a1ec773cdb22d56c1
   React-Mapbuffer: 92b99e450e8ff598b27d6e4db3a75e04fd45e9a9
   React-microtasksnativemodule: 2fe0f2bd2840dedbd66c0ac249c64f977f39cc18
-  react-native-face-sdk: b21d5413340eedec2ef6103154eb81f142b6a48d
+  react-native-face-sdk: 1cd462ad635cb1fe2e42e5d92a0f9797caee4ece
   react-native-safe-area-context: 5727bd761ca52fa393b40989a6483bf859622136
   React-NativeModulesApple: 44a9474594566cd03659f92e38f42599c6b9dee4
   React-networking: db73d91466cb134fcbdaaa579fb2de14e2c2ea01

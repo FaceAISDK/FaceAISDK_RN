@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
     'ios/build/**/*'
   ]
   s.resources    = [
-    'ios/FaceAISDK/Localizable.xcstrings',
+    'ios/Resources/*.lproj',
     'ios/FaceAISDK/light_too_high.png',
   ]
   s.requires_arc = true
